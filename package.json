@@ -7,6 +7,10 @@
     "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
+    "@tensorflow-models/posenet": "^2.2.2",
+    "@tensorflow/tfjs-core": "^3.3.0",
+    "@tensorflow/tfjs-converter": "^3.3.0",
+    "@tensorflow/tfjs-backend-webgl": "^3.3.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
@@ -25,6 +29,6 @@
     "chai": "^4.2.0",
     "prettier": "^2.0.5",
     "snowpack": "^3.0.1",
-    "typescript": "^4.0.0"
+    "typescript": "^4.2.3"
   }
 }
