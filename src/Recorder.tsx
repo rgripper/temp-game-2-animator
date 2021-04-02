@@ -1,0 +1,98 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import './App.css';
+import * as posenet from '@tensorflow-models/posenet';
+import '@tensorflow/tfjs-converter';
+import '@tensorflow/tfjs-core';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
+import useInterval from './useInterval';
+
+export type RecorderResult = { frames: ImageData[]; resolution: { width: number; height: number } };
+
+type AppProps = { onComplete: (result: RecorderResult) => void };
+
+export function Recorder({ onComplete }: AppProps) {
+  // const videoRef = useRef<HTMLVideoElement | null>(null)
+
+  const maxAnimationDurationSec = 3;
+  const framePerSec = 1;
+
+  const [frames, setFrames] = useState<ImageData[]>([]);
+
+  const [isRecordingComplete, setIsRecordingComplete] = useState(false);
+
+  const [context, setContext] = useState<OffscreenCanvasRenderingContext2D | null>(null);
+  const [video, setVideo] = useState<HTMLVideoElement | null>(null);
+
+  const [resolution, setResolution] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
+
+  useEffect(() => {
+    if (isRecordingComplete) {
+      onComplete({ frames, resolution: resolution! });
+    }
+  }, [isRecordingComplete, frames]);
+
+  const setVideoAndCanvas = useCallback((video: HTMLVideoElement | null) => {
+    if (!video) return;
+
+    const constraints = {
+      video: true,
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      video.srcObject = stream;
+    });
+  }, []);
+
+  useInterval(async (intervalId) => {
+    if (!resolution || !context || !video) return;
+    context.clearRect(0, 0, resolution.width, resolution.height);
+    context.drawImage(video, 0, 0, resolution.width, resolution.height);
+    const frame = context.getImageData(0, 0, resolution.width, resolution.height);
+
+    setFrames((frames) => {
+      if (frames.length === maxAnimationDurationSec * framePerSec) {
+        clearInterval(intervalId);
+        setIsRecordingComplete(true);
+        return frames;
+      } else {
+        return [...frames, frame];
+      }
+    });
+  }, 100);
+
+  const startRecording = useCallback(async (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    const video = event.currentTarget;
+    const inputResolution = {
+      width: video.videoWidth,
+      height: video.videoHeight,
+    };
+
+    if (!('OffscreenCanvas' in globalThis)) {
+      throw new Error('Set gfx.offscreencanvas.enabled=true in about:config');
+    }
+
+    const offscreen = new OffscreenCanvas(inputResolution.width, inputResolution.height);
+    const context = offscreen.getContext('2d');
+    if (!context) {
+      throw new Error('context is null');
+    }
+
+    video.width = inputResolution.width;
+    video.height = inputResolution.height;
+
+    setResolution(inputResolution);
+    setContext(context);
+    setVideo(video);
+  }, []);
+
+  return (
+    <div className="App" style={{ position: 'relative' }}>
+      <video id="vid" ref={setVideoAndCanvas} onLoadedData={startRecording} autoPlay></video>
+      <div>{isRecordingComplete ? 'Done' : `Recording ${frames.length}/${maxAnimationDurationSec * framePerSec}`}</div>
+    </div>
+  );
+}
