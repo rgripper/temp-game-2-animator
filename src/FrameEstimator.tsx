@@ -2,18 +2,28 @@ import React from 'react';
 import * as posenet from '@tensorflow-models/posenet';
 import { useEffect, useState } from 'react';
 import type { RecorderResult } from './Recorder';
+import '@tensorflow/tfjs-converter';
+import '@tensorflow/tfjs-core';
+// import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
 
 export function FrameEstimator({
-  recorderResult: { resolution, frames },
+  resolution,
+  frames,
   onComplete,
 }: {
-  recorderResult: RecorderResult;
+  frames: ImageData[];
+  resolution: {
+    width: number;
+    height: number;
+  };
   onComplete: (poses: posenet.Pose[]) => void;
 }) {
   const [poses, setPoses] = useState<(posenet.Pose | null)[]>(frames.map(() => null));
 
   useEffect(() => {
     if (poses.every((p): p is posenet.Pose => p != null)) {
+      console.log(JSON.stringify(poses));
       onComplete(poses);
     }
   }, [poses]);

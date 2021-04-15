@@ -1,21 +1,44 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './App.css';
-import * as posenet from '@tensorflow-models/posenet';
-import '@tensorflow/tfjs-converter';
-import '@tensorflow/tfjs-core';
-import '@tensorflow/tfjs-backend-webgl';
-import '@tensorflow/tfjs-backend-cpu';
 import useInterval from './useInterval';
 
 export type RecorderResult = { frames: ImageData[]; resolution: { width: number; height: number } };
 
-type AppProps = { onComplete: (result: RecorderResult) => void };
+type AppProps = {
+  onComplete: (result: RecorderResult) => void;
+  countdownSeconds: number;
+  durationSeconds: number;
+  framesPerSec: number;
+};
 
-export function Recorder({ onComplete }: AppProps) {
+function useCountdown(seconds: number): number {
+  const [countdown, setCountdown] = useState(seconds);
+  const countdownRef = useRef(countdown);
+  countdownRef.current = countdown;
+
+  useEffect(() => {
+    let isCancelled = false;
+    function runCountdown() {
+      setTimeout(() => {
+        if (isCancelled || countdownRef.current === 0) {
+          return;
+        }
+        setCountdown((x) => x - 1);
+        runCountdown();
+      }, 1000);
+    }
+    runCountdown();
+    return () => {
+      isCancelled = true;
+    };
+  }, [seconds]);
+
+  return countdown;
+}
+
+export function Recorder({ onComplete, countdownSeconds, durationSeconds, framesPerSec }: AppProps) {
   // const videoRef = useRef<HTMLVideoElement | null>(null)
-
-  const maxAnimationDurationSec = 3;
-  const framePerSec = 1;
+  const countdown = useCountdown(countdownSeconds);
 
   const [frames, setFrames] = useState<ImageData[]>([]);
 
@@ -54,7 +77,7 @@ export function Recorder({ onComplete }: AppProps) {
     const frame = context.getImageData(0, 0, resolution.width, resolution.height);
 
     setFrames((frames) => {
-      if (frames.length === maxAnimationDurationSec * framePerSec) {
+      if (frames.length === durationSeconds * framesPerSec) {
         clearInterval(intervalId);
         setIsRecordingComplete(true);
         return frames;
@@ -62,7 +85,7 @@ export function Recorder({ onComplete }: AppProps) {
         return [...frames, frame];
       }
     });
-  }, 100);
+  }, 1000 / framesPerSec);
 
   const startRecording = useCallback(async (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     const video = event.currentTarget;
@@ -91,8 +114,16 @@ export function Recorder({ onComplete }: AppProps) {
 
   return (
     <div className="App" style={{ position: 'relative' }}>
-      <video id="vid" ref={setVideoAndCanvas} onLoadedData={startRecording} autoPlay></video>
-      <div>{isRecordingComplete ? 'Done' : `Recording ${frames.length}/${maxAnimationDurationSec * framePerSec}`}</div>
+      {countdown ? (
+        <div style={{ position: 'absolute', fontSize: 500, textAlign: 'center', width: '100%', height: '100%' }}>
+          {countdown}
+        </div>
+      ) : (
+        <>
+          <video id="vid" ref={setVideoAndCanvas} onLoadedData={startRecording} autoPlay></video>
+          <div>{isRecordingComplete ? 'Done' : `Recording ${frames.length}/${durationSeconds * framesPerSec}`}</div>
+        </>
+      )}
     </div>
   );
 }
