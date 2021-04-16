@@ -37,10 +37,10 @@ function FramePose({ pose }: { pose: Pose }) {
   const keypointMap = (Object.fromEntries(pose.keypoints.map((x) => [x.part, x.position])) as unknown) as KeypointMap;
 
   return (
-    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 500 500" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
       {/** Neck */}
       <line
-        x1={keypointMap.leftShoulder.x + (keypointMap.rightShoulder.x + keypointMap.leftShoulder.x) / 2}
+        x1={keypointMap.leftShoulder.x + (keypointMap.rightShoulder.x - keypointMap.leftShoulder.x) / 2}
         y1={(keypointMap.leftShoulder.y + keypointMap.rightShoulder.y) / 2}
         x2={keypointMap.nose.x}
         y2={keypointMap.nose.y}
@@ -81,6 +81,14 @@ function FramePose({ pose }: { pose: Pose }) {
         y1={keypointMap.rightElbow.y}
         x2={keypointMap.rightWrist.x}
         y2={keypointMap.rightWrist.y}
+        stroke="black"
+      />
+      {/** Pelvis */}
+      <line
+        x1={keypointMap.leftHip.x}
+        y1={keypointMap.leftHip.y}
+        x2={keypointMap.rightHip.x}
+        y2={keypointMap.rightHip.y}
         stroke="black"
       />
       {/** Left leg */}

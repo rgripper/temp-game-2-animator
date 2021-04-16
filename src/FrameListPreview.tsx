@@ -21,37 +21,43 @@ export function FrameListPreview({
               )
             }
             style={{
-              width: 200,
-              height: 200,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid #ccc',
+              listStyleType: 'none',
+              border: selectedFrameIndices.includes(i) ? '3px solid #33f' : '3px solid #ccc',
               position: 'relative',
             }}
           >
-            <Thumbnail frame={frame} />
+            <Thumbnail frame={frame} size={100} />
             <div
               style={{
                 position: 'absolute',
+                top: '0',
+                left: '0',
                 width: '100%',
                 height: '100%',
-                background: '#777',
+                background: '#333',
                 zIndex: 1,
-                opacity: selectedFrameIndices.length && !selectedFrameIndices.includes(i) ? '0.3' : '0',
+                opacity: selectedFrameIndices.length && !selectedFrameIndices.includes(i) ? '0.5' : '0',
               }}
             ></div>
           </li>
         ))}
       </ul>
       <div>
-        <button onClick={() => onSelect(selectedFrameIndices.map((i) => frames[i]))}>Process</button>
+        <button
+          onClick={() => {
+            const selectedFrames = selectedFrameIndices.map((i) => frames[i]);
+            console.log(selectedFrames);
+            onSelect(selectedFrames);
+          }}
+        >
+          Process
+        </button>
       </div>
     </div>
   );
 }
 
-function Thumbnail({ frame }: { frame: ImageData }) {
+function Thumbnail({ frame, size }: { frame: ImageData; size: number }) {
   const setFrame = useCallback(
     (canvas: HTMLCanvasElement | null) => {
       if (!canvas) {
@@ -64,7 +70,7 @@ function Thumbnail({ frame }: { frame: ImageData }) {
 
       const context = canvas.getContext('2d')!;
 
-      const scaleFactor = 200 / Math.max(frame.height, frame.width);
+      const scaleFactor = size / Math.max(frame.height, frame.width);
       canvas.width = Math.round(frame.width * scaleFactor);
       canvas.height = Math.round(frame.height * scaleFactor);
       context.scale(scaleFactor, scaleFactor);

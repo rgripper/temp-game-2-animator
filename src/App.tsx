@@ -9,6 +9,7 @@ import { FrameEstimator } from './FrameEstimator';
 import type { Pose } from '@tensorflow-models/posenet';
 import { Animator } from './Animator';
 import { FrameListPreview } from './FrameListPreview';
+import posesJson from './poses.json';
 
 type AppProps = {};
 
@@ -16,10 +17,7 @@ function App({}: AppProps) {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(null);
   const [selectedFrames, setSelectedFrames] = useState<ImageData[] | null>(null);
 
-  const [poses, setPoses] = useState<Pose[] | null>(() => {
-    const storedPosesJson = window.localStorage.getItem('poses');
-    return storedPosesJson && JSON.parse(storedPosesJson);
-  });
+  const [poses, setPoses] = useState<Pose[] | null>(posesJson);
 
   useEffect(() => {
     if (poses) {
@@ -29,15 +27,15 @@ function App({}: AppProps) {
 
   return (
     <>
-      {!recorderResult && (
-        <Recorder onComplete={setRecorderResult} countdownSeconds={1} durationSeconds={1} framesPerSec={10} />
+      {/* {!recorderResult && (
+        <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={1} framesPerSec={10} />
       )}
       {recorderResult && !selectedFrames && (
         <FrameListPreview onSelect={setSelectedFrames} frames={recorderResult.frames} />
       )}
       {recorderResult && selectedFrames && !poses && (
         <FrameEstimator frames={selectedFrames} resolution={recorderResult.resolution} onComplete={setPoses} />
-      )}
+      )} */}
       {poses && <Animator poses={poses} />}
     </>
   );
