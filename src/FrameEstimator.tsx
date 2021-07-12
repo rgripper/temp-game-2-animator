@@ -1,11 +1,15 @@
 import React from 'react';
-import * as posenet from '@tensorflow-models/posenet';
+import * as poseDetection from '@tensorflow-models/pose-detection';
 import { useEffect, useState } from 'react';
 import type { RecorderResult } from './Recorder';
 import '@tensorflow/tfjs-converter';
 import '@tensorflow/tfjs-core';
-// import '@tensorflow/tfjs-backend-webgl';
-import '@tensorflow/tfjs-backend-cpu';
+import '@tensorflow/tfjs-backend-webgl';
+// import '@tensorflow/tfjs-backend-cpu';
+
+export type Pose = poseDetection.Pose;
+export type Keypoint = poseDetection.Keypoint;
+export type Point = { x: number; y: number; z?: number };
 
 export function FrameEstimator({
   resolution,
@@ -17,38 +21,45 @@ export function FrameEstimator({
     width: number;
     height: number;
   };
-  onComplete: (poses: posenet.Pose[]) => void;
+  onComplete: (poses: poseDetection.Pose[]) => void;
 }) {
-  const [poses, setPoses] = useState<(posenet.Pose | null)[]>(frames.map(() => null));
+  const [poses, setPoses] = useState<(poseDetection.Pose | null)[]>(frames.map(() => null));
 
   useEffect(() => {
-    if (poses.every((p): p is posenet.Pose => p != null)) {
+    if (poses.every((p): p is poseDetection.Pose => p != null)) {
       console.log(JSON.stringify(poses));
       onComplete(poses);
     }
   }, [poses]);
 
   useEffect(() => {
-    posenet
-      .load({
-        architecture: 'ResNet50',
-        outputStride: 32,
-        inputResolution: resolution,
-        quantBytes: 2,
-      })
-      .then((net) => {
+    async function detect() {
+      try {
+        const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, {
+          modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+          enableSmoothing: true,
+        });
         setPoses(frames.map(() => null));
 
-        frames.map((frame, frameIndex) => {
-          net
-            .estimateSinglePose(frame, {
+        const allPoses = await Promise.all(
+          frames.map(async (frame, frameIndex) => {
+            const [currentPose] = await detector.estimatePoses(frame, {
               flipHorizontal: false,
-            })
-            .then((currentPose) => {
-              setPoses((poses) => poses.map((pose, poseIndex) => (poseIndex === frameIndex ? currentPose : pose)));
+              maxPoses: 1,
             });
-        });
-      });
+
+            setPoses((poses) => poses.map((pose, poseIndex) => (poseIndex === frameIndex ? currentPose : pose)));
+
+            return currentPose;
+          }),
+        );
+
+        console.log(JSON.stringify(allPoses));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    detect().then();
   }, [frames]);
 
   const divSize = {
@@ -72,18 +83,18 @@ export function FrameEstimator({
               }}
             >
               {pose.keypoints.map((keypoint) => {
-                const hasPosition = !!(keypoint.position.x && keypoint.position.y);
+                const hasPosition = keypoint.x !== undefined && keypoint.y !== undefined;
                 //hasPosition &&
                 //console.log(resolution, keypoint.part, keypoint.position);
                 return (
                   hasPosition && (
                     <div
-                      key={keypoint.part}
-                      title={keypoint.part}
+                      key={keypoint.name}
+                      title={keypoint.name}
                       style={{
                         position: 'absolute',
-                        left: Math.ceil(keypoint.position.x) + 'px',
-                        top: Math.ceil(keypoint.position.y) + 'px',
+                        left: Math.ceil(keypoint.x) + 'px',
+                        top: Math.ceil(keypoint.y) + 'px',
                         width: '10px',
                         height: '10px',
                         background: 'green',

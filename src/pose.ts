@@ -1,5 +1,3 @@
-import posenet from '@tensorflow-models/posenet';
-
 // async function estimatePoseOnImage(imageElement: HTMLImageElement) {
 //   // load the posenet model from a checkpoint
 //   //  const net = await posenet.load();

@@ -1,6 +1,5 @@
 import React from 'react';
-import type { Pose } from '@tensorflow-models/posenet';
-import type { Vector2D } from '@tensorflow-models/posenet/dist/types';
+import type { Point, Pose } from './FrameEstimator';
 
 export function Animator({ poses }: { poses: Pose[] }) {
   return (
@@ -14,111 +13,113 @@ export function Animator({ poses }: { poses: Pose[] }) {
 
 type KeypointMap = Record<
   | 'nose'
-  | 'leftEye'
-  | 'rightEye'
-  | 'leftEar'
-  | 'rightEar'
-  | 'leftShoulder'
-  | 'rightShoulder'
-  | 'leftElbow'
-  | 'rightElbow'
-  | 'leftWrist'
-  | 'rightWrist'
-  | 'leftHip'
-  | 'rightHip'
-  | 'leftKnee'
-  | 'rightKnee'
-  | 'leftAnkle'
-  | 'rightAnkle',
-  Vector2D
+  | 'left_eye'
+  | 'right_eye'
+  | 'left_ear'
+  | 'right_ear'
+  | 'left_shoulder'
+  | 'right_shoulder'
+  | 'left_elbow'
+  | 'right_elbow'
+  | 'left_wrist'
+  | 'right_wrist'
+  | 'left_hip'
+  | 'right_hip'
+  | 'left_knee'
+  | 'right_knee'
+  | 'left_ankle'
+  | 'right_ankle',
+  Point
 >;
 
 function FramePose({ pose }: { pose: Pose }) {
-  const keypointMap = (Object.fromEntries(pose.keypoints.map((x) => [x.part, x.position])) as unknown) as KeypointMap;
+  const keypointMap = (Object.fromEntries(
+    pose.keypoints.map((keypoint) => [keypoint.name, { x: keypoint.x, y: keypoint.y, z: keypoint.z }]),
+  ) as unknown) as KeypointMap;
 
   return (
     <svg viewBox="0 0 500 500" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
       {/** Neck */}
       <line
-        x1={keypointMap.leftShoulder.x + (keypointMap.rightShoulder.x - keypointMap.leftShoulder.x) / 2}
-        y1={(keypointMap.leftShoulder.y + keypointMap.rightShoulder.y) / 2}
+        x1={keypointMap.left_shoulder.x + (keypointMap.right_shoulder.x - keypointMap.left_shoulder.x) / 2}
+        y1={(keypointMap.left_shoulder.y + keypointMap.right_shoulder.y) / 2}
         x2={keypointMap.nose.x}
         y2={keypointMap.nose.y}
         stroke="black"
       />
       <line
-        x1={keypointMap.leftShoulder.x}
-        y1={keypointMap.leftShoulder.y}
-        x2={keypointMap.rightShoulder.x}
-        y2={keypointMap.rightShoulder.y}
+        x1={keypointMap.left_shoulder.x}
+        y1={keypointMap.left_shoulder.y}
+        x2={keypointMap.right_shoulder.x}
+        y2={keypointMap.right_shoulder.y}
         stroke="black"
       />
       {/** Left arm */}
       <line
-        x1={keypointMap.leftShoulder.x}
-        y1={keypointMap.leftShoulder.y}
-        x2={keypointMap.leftElbow.x}
-        y2={keypointMap.leftElbow.y}
+        x1={keypointMap.left_shoulder.x}
+        y1={keypointMap.left_shoulder.y}
+        x2={keypointMap.left_elbow.x}
+        y2={keypointMap.left_elbow.y}
         stroke="black"
       />
       <line
-        x1={keypointMap.leftElbow.x}
-        y1={keypointMap.leftElbow.y}
-        x2={keypointMap.leftWrist.x}
-        y2={keypointMap.leftWrist.y}
+        x1={keypointMap.left_elbow.x}
+        y1={keypointMap.left_elbow.y}
+        x2={keypointMap.left_wrist.x}
+        y2={keypointMap.left_wrist.y}
         stroke="black"
       />
       {/** Right arm */}
       <line
-        x1={keypointMap.rightShoulder.x}
-        y1={keypointMap.rightShoulder.y}
-        x2={keypointMap.rightElbow.x}
-        y2={keypointMap.rightElbow.y}
+        x1={keypointMap.right_shoulder.x}
+        y1={keypointMap.right_shoulder.y}
+        x2={keypointMap.right_elbow.x}
+        y2={keypointMap.right_elbow.y}
         stroke="black"
       />
       <line
-        x1={keypointMap.rightElbow.x}
-        y1={keypointMap.rightElbow.y}
-        x2={keypointMap.rightWrist.x}
-        y2={keypointMap.rightWrist.y}
+        x1={keypointMap.right_elbow.x}
+        y1={keypointMap.right_elbow.y}
+        x2={keypointMap.right_wrist.x}
+        y2={keypointMap.right_wrist.y}
         stroke="black"
       />
       {/** Pelvis */}
       <line
-        x1={keypointMap.leftHip.x}
-        y1={keypointMap.leftHip.y}
-        x2={keypointMap.rightHip.x}
-        y2={keypointMap.rightHip.y}
+        x1={keypointMap.left_hip.x}
+        y1={keypointMap.left_hip.y}
+        x2={keypointMap.right_hip.x}
+        y2={keypointMap.right_hip.y}
         stroke="black"
       />
       {/** Left leg */}
       <line
-        x1={keypointMap.leftHip.x}
-        y1={keypointMap.leftHip.y}
-        x2={keypointMap.leftKnee.x}
-        y2={keypointMap.leftKnee.y}
+        x1={keypointMap.left_hip.x}
+        y1={keypointMap.left_hip.y}
+        x2={keypointMap.left_knee.x}
+        y2={keypointMap.left_knee.y}
         stroke="black"
       />
       <line
-        x1={keypointMap.leftKnee.x}
-        y1={keypointMap.leftKnee.y}
-        x2={keypointMap.leftAnkle.x}
-        y2={keypointMap.leftAnkle.y}
+        x1={keypointMap.left_knee.x}
+        y1={keypointMap.left_knee.y}
+        x2={keypointMap.left_ankle.x}
+        y2={keypointMap.left_ankle.y}
         stroke="black"
       />
       {/** Left leg */}
       <line
-        x1={keypointMap.rightHip.x}
-        y1={keypointMap.rightHip.y}
-        x2={keypointMap.rightKnee.x}
-        y2={keypointMap.rightKnee.y}
+        x1={keypointMap.right_hip.x}
+        y1={keypointMap.right_hip.y}
+        x2={keypointMap.right_knee.x}
+        y2={keypointMap.right_knee.y}
         stroke="black"
       />
       <line
-        x1={keypointMap.rightKnee.x}
-        y1={keypointMap.rightKnee.y}
-        x2={keypointMap.rightAnkle.x}
-        y2={keypointMap.rightAnkle.y}
+        x1={keypointMap.right_knee.x}
+        y1={keypointMap.right_knee.y}
+        x2={keypointMap.right_ankle.x}
+        y2={keypointMap.right_ankle.y}
         stroke="black"
       />
     </svg>
