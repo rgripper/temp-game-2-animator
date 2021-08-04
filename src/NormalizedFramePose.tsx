@@ -3,6 +3,7 @@ import React from 'react';
 import type { KeypointMap } from './Animator';
 import type { Pose } from './FrameEstimator';
 import helmetUrl from './helmet.png';
+import swordUrl from './sword3.png';
 
 const bodyStyles = css`
   line {
@@ -23,6 +24,7 @@ export function NormalizedFramePose({ pose }: { pose: Pose }) {
     <svg className={bodyStyles} viewBox="0 0 800 800" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
       <Head keypointMap={keypointMap} />
       <Neck keypointMap={keypointMap} torsoRect={torsoRect} />
+      <Sword keypointMap={keypointMap} />
       {/** Neck */}
       <line
         x1={keypointMap.left_shoulder.x}
@@ -146,6 +148,23 @@ type Rectangle = {
   x2: number;
   y2: number;
 };
+
+function Sword({ keypointMap }: { keypointMap: KeypointMap }) {
+  const angleDeg =
+    (Math.atan2(
+      keypointMap.right_elbow.y - keypointMap.right_wrist.y,
+      keypointMap.right_elbow.x - keypointMap.right_wrist.x,
+    ) *
+      180) /
+    Math.PI;
+  const { x, y } = keypointMap.right_wrist;
+
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${angleDeg})`}>
+      <image width={40} height={120} transform={`translate(${-10} ${-110})`} href={swordUrl}></image>
+    </g>
+  );
+}
 
 function Torso({ torsoRect }: { torsoRect: Rectangle }) {
   const width = Math.abs(torsoRect.x1 - torsoRect.x2);
