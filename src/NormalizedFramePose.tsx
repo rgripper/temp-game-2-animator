@@ -1,18 +1,8 @@
 import { css } from '@emotion/css';
 import React from 'react';
-import type { Point, Pose } from './FrameEstimator';
+import type { KeypointMap } from './Animator';
+import type { Pose } from './FrameEstimator';
 import helmetUrl from './helmet.png';
-import { NormalizedFramePose } from './NormalizedFramePose';
-
-export function Animator({ poses }: { poses: Pose[] }) {
-  return (
-    <>
-      {poses.map((x) => (
-        <NormalizedFramePose pose={x} />
-      ))}
-    </>
-  );
-}
 
 const bodyStyles = css`
   line {
@@ -25,46 +15,9 @@ const bodyStyles = css`
   }
 `;
 
-type CharacterDirection = 'right' | 'left' | 'front' | 'back';
-
-export type KeypointMap = Record<
-  | 'nose'
-  | 'left_eye'
-  | 'right_eye'
-  | 'left_ear'
-  | 'right_ear'
-  | 'left_shoulder'
-  | 'right_shoulder'
-  | 'left_elbow'
-  | 'right_elbow'
-  | 'left_wrist'
-  | 'right_wrist'
-  | 'left_hip'
-  | 'right_hip'
-  | 'left_knee'
-  | 'right_knee'
-  | 'left_ankle'
-  | 'right_ankle',
-  Point
->;
-
-function FramePose({ pose }: { pose: Pose }) {
+export function NormalizedFramePose({ pose }: { pose: Pose }) {
   const originalKeypointMap = getKeypointMap(pose);
-  const keypointMap = normalizeMap(originalKeypointMap);
-  const srcTorsoRect = {
-    x1: (keypointMap.left_shoulder.x + keypointMap.left_hip.x) / 2,
-    x2: (keypointMap.right_shoulder.x + keypointMap.right_hip.x) / 2,
-    y1: (keypointMap.left_shoulder.y + keypointMap.right_shoulder.y) / 2,
-    y2: (keypointMap.left_hip.y + keypointMap.right_hip.y) / 2,
-  };
-
-  const torsoRect = {
-    ...srcTorsoRect,
-    x2: srcTorsoRect.x1 - 40,
-  };
-
-  const torsoTopMidX = (torsoRect.x1 + torsoRect.x2) / 2;
-  const characterDirection = keypointMap.nose.x < torsoTopMidX ? 'left' : 'right';
+  const { keypointMap, torsoRect } = normalizeMap(originalKeypointMap);
 
   return (
     <svg className={bodyStyles} viewBox="0 0 800 800" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +119,7 @@ function FramePose({ pose }: { pose: Pose }) {
 }
 
 function Head({ keypointMap }: { keypointMap: KeypointMap }) {
-  const width = 40; // Math.abs(keypointMap.right_ear.x - keypointMap.left_ear.x) + 5;
+  const width = 50; // Math.abs(keypointMap.right_ear.x - keypointMap.left_ear.x) + 5;
   const midX = (keypointMap.right_ear.x + keypointMap.left_ear.x) / 2;
   return (
     // <rect x={midX - width / 2} y={keypointMap.nose.y - width / 2} width={width} height={width} fill="blue">
@@ -226,12 +179,27 @@ export function getKeypointMap(pose: Pose): KeypointMap {
   ) as unknown as KeypointMap;
 }
 
-function normalizeMap(keypointMap: KeypointMap): KeypointMap {
-  const torsoRect = {
+function normalizeMap(keypointMap: KeypointMap): { keypointMap: KeypointMap; torsoRect: any } {
+  const torsoRaw = {
     x1: (keypointMap.left_shoulder.x + keypointMap.left_hip.x) / 2,
     x2: (keypointMap.right_shoulder.x + keypointMap.right_hip.x) / 2,
     y1: (keypointMap.left_shoulder.y + keypointMap.right_shoulder.y) / 2,
     y2: (keypointMap.left_hip.y + keypointMap.right_hip.y) / 2,
+  };
+
+  const torsoAvgX = (torsoRaw.x1 + torsoRaw.x2) / 2;
+  const torsoAvgY = (torsoRaw.y1 + torsoRaw.y2) / 2;
+
+  const halfWidth = 20;
+  const halfHeight = 60;
+
+  const isLeft = keypointMap.left_shoulder.x < keypointMap.right_shoulder.x;
+
+  const torsoRect = {
+    x1: torsoAvgX + (isLeft ? -halfWidth : +halfWidth),
+    x2: torsoAvgX + (isLeft ? +halfWidth : -halfWidth),
+    y1: torsoAvgY - halfHeight,
+    y2: torsoAvgY + halfHeight,
   };
 
   const torsoParts = {
@@ -269,7 +237,7 @@ function normalizeMap(keypointMap: KeypointMap): KeypointMap {
   const lowerShiftY =
     (torsoParts.left_hip.y - keypointMap.left_hip.y + (torsoParts.right_hip.y - keypointMap.right_hip.y)) / 2;
 
-  return {
+  const normalizedKeypointMap = {
     ...keypointMap, // TODO
     ...torsoParts,
     nose: {
@@ -304,5 +272,10 @@ function normalizeMap(keypointMap: KeypointMap): KeypointMap {
       x: keypointMap.right_ankle.x + lowerShiftX,
       y: keypointMap.right_ankle.y + lowerShiftY,
     },
+  };
+
+  return {
+    keypointMap: normalizedKeypointMap,
+    torsoRect,
   };
 }
