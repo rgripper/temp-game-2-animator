@@ -161,7 +161,7 @@ function Sword({ keypointMap }: { keypointMap: KeypointMap }) {
 
   return (
     <g transform={`translate(${x} ${y}) rotate(${angleDeg})`}>
-      <image width={40} height={120} transform={`translate(${-10} ${-110})`} href={swordUrl}></image>
+      <image width={40} height={200} transform={`translate(${-15} ${-160})`} href={swordUrl}></image>
     </g>
   );
 }
