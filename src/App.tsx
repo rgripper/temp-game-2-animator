@@ -39,8 +39,8 @@ function App({}: AppProps) {
     </>
   ) : (
     <>
-      {poses && <Animator poses={poses} />}
-      {poses && <Dresser pose={poses[0]} />}
+      {/* {poses && <Animator poses={poses} />} */}
+      {poses && <Dresser pose={poses[5]} />}
     </>
   );
 }
