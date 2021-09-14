@@ -42,7 +42,15 @@ function renderPose(
 
   const isLeft = (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2 > keypointMap.nose.x;
 
-  drawSword(keypointMap, ctx, swordImage, isLeft);
+  const handSize = 3;
+  const handHorizontalOffset = isLeft ? -handSize : handSize; // todo depends on whether the character is on the right or left
+  ctx.fillStyle = 'orange';
+  const rightHandPosition = { x: keypointMap.right_wrist.x + handHorizontalOffset, y: keypointMap.right_wrist.y };
+  ctx.fillRect(rightHandPosition.x + handSize / 2, rightHandPosition.y - handSize / 2, handSize, handSize);
+  const leftHandPosition = { x: keypointMap.left_wrist.x + handHorizontalOffset, y: keypointMap.left_wrist.y };
+  ctx.fillRect(leftHandPosition.x + handSize / 2, leftHandPosition.y - handSize / 2, handSize, handSize);
+
+  drawSword(keypointMap, rightHandPosition, ctx, swordImage);
 
   ctx.fillStyle = '#770000aa';
   // head
@@ -118,22 +126,15 @@ function drawHead(
 
 function drawSword(
   keypointMap: KeypointMap,
+  handPosition: Point,
   ctx: CanvasRenderingContext2D,
   weaponImage: HTMLImageElement,
-  isLeft: boolean,
 ) {
   const angleRad = getPerpendicularAngleRad(keypointMap.right_elbow, keypointMap.right_wrist);
-  const { x, y } = keypointMap.right_wrist;
-  const handHorizontalOffset = isLeft ? -2 : 2; // todo depends on whether the character is on the right or left
-
-  const handSize = 2;
-  const handPosition = { x: x + handHorizontalOffset, y };
-  ctx.fillStyle = 'orange';
-  ctx.fillRect(handPosition.x + handSize / 2, handPosition.y - handSize / 2, handSize, handSize);
 
   const width = 8;
   const height = (weaponImage.height * width) / weaponImage.width;
-  const holdingPoint = { x: width * 0.5, y: height * 0.8 };
+  const holdingPoint = { x: width * 0.3, y: height * 0.75 };
 
   ctx.fillStyle = 'red';
 
@@ -166,18 +167,21 @@ function drawTorso(ctx: CanvasRenderingContext2D, keypointMap: KeypointMap, meta
   drawLimb(keypointMap.left_hip, keypointMap.right_hip, ctx, metalImage, 3);
 
   // torso
+  ctx.save();
   ctx.beginPath();
 
-  ctx.moveTo(keypointMap.left_shoulder.x, keypointMap.left_shoulder.y);
-  ctx.lineTo(keypointMap.right_shoulder.x, keypointMap.right_shoulder.y);
-  ctx.lineTo(keypointMap.right_hip.x, keypointMap.right_hip.y);
+  const armWidth = 2;
+  ctx.moveTo(keypointMap.left_shoulder.x, keypointMap.left_shoulder.y - armWidth + 1);
+  ctx.lineTo(keypointMap.right_shoulder.x - armWidth, keypointMap.right_shoulder.y - armWidth + 1);
+  ctx.lineTo(keypointMap.right_hip.x - armWidth, keypointMap.right_hip.y);
   ctx.lineTo(keypointMap.left_hip.x, keypointMap.left_hip.y);
   // ctx.moveTo(keypointMap.left_shoulder.x, keypointMap.left_shoulder.y);
-  ctx.closePath();
+  // ctx.closePath();
 
-  // ctx.clip();
+  ctx.clip();
 
-  // ctx.drawImage(metalImage, keypointMap.right_shoulder.x, keypointMap.right_shoulder.y, 100, 100);
+  ctx.drawImage(metalImage, keypointMap.right_shoulder.x - 10, keypointMap.right_shoulder.y - 10, 120, 120);
+  ctx.restore();
 }
 function drawLimb(
   point1: Point,
