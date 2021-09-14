@@ -3,18 +3,20 @@ import React, { useEffect, useState } from 'react';
 import { getKeypointMap, KeypointMap } from './Animator';
 import metalSrc from './metal.jpg';
 import swordSrc from './sword3.png';
+import helmetSrc from './helmet.png';
 
 export function Dresser({ pose }: { pose: Pose }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
 
   const metalImage = useImage(metalSrc);
   const swordImage = useImage(swordSrc);
+  const helmetImage = useImage(helmetSrc);
 
   useEffect(() => {
-    if (canvas && metalImage && swordImage) {
-      renderPose(canvas, pose, metalImage, swordImage);
+    if (canvas && metalImage && swordImage && helmetImage) {
+      renderPose(canvas, pose, metalImage, swordImage, helmetImage);
     }
-  }, [canvas, pose, metalImage, swordImage]);
+  }, [canvas, pose, metalImage, swordImage, helmetImage]);
 
   return <canvas style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} width={800} height={600} />;
 }
@@ -26,7 +28,13 @@ function scaleDown(pose: Pose): Pose {
   };
 }
 
-function renderPose(canvas: HTMLCanvasElement, pose: Pose, metalImage: HTMLImageElement, swordImage: HTMLImageElement) {
+function renderPose(
+  canvas: HTMLCanvasElement,
+  pose: Pose,
+  metalImage: HTMLImageElement,
+  swordImage: HTMLImageElement,
+  helmetImage: HTMLImageElement,
+) {
   const ctx = canvas.getContext('2d')!;
 
   ctx.imageSmoothingEnabled = false;
@@ -34,20 +42,43 @@ function renderPose(canvas: HTMLCanvasElement, pose: Pose, metalImage: HTMLImage
 
   const isLeft = (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2 > keypointMap.nose.x;
 
-  // single-hand weapon
-
   drawSword(keypointMap, ctx, swordImage, isLeft);
 
   ctx.fillStyle = '#770000aa';
   // head
 
-  ctx.fillRect(
-    (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2 - 2,
-    (keypointMap.left_ear.y + keypointMap.right_ear.y) / 2 - 2,
-    4,
-    4,
-  );
+  // ctx.fillRect(
+  //   (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2 - 2,
+  //   (keypointMap.left_ear.y + keypointMap.right_ear.y) / 2 - 2,
+  //   4,
+  //   4,
+  // );
 
+  drawNeck(ctx, keypointMap);
+
+  drawHead(helmetImage, ctx, keypointMap, isLeft);
+
+  // shoulders and arms
+
+  drawTorso(ctx, keypointMap, metalImage);
+  ctx.beginPath();
+  // lower body
+
+  drawLimb(keypointMap.left_hip, keypointMap.left_knee, ctx, metalImage, 3);
+  drawLimb(keypointMap.right_hip, keypointMap.right_knee, ctx, metalImage, 3);
+
+  ctx.strokeStyle = 'orange';
+  ctx.moveTo(keypointMap.left_knee.x, keypointMap.left_knee.y);
+  ctx.lineTo(keypointMap.left_ankle.x, keypointMap.left_ankle.y);
+
+  ctx.moveTo(keypointMap.right_knee.x, keypointMap.right_knee.y);
+  ctx.lineTo(keypointMap.right_ankle.x, keypointMap.right_ankle.y);
+
+  ctx.stroke();
+}
+
+function drawNeck(ctx: CanvasRenderingContext2D, keypointMap: KeypointMap) {
+  ctx.strokeStyle = 'orange';
   ctx.beginPath();
   ctx.moveTo(
     keypointMap.left_shoulder.x + (keypointMap.right_shoulder.x - keypointMap.left_shoulder.x) / 2,
@@ -57,26 +88,32 @@ function renderPose(canvas: HTMLCanvasElement, pose: Pose, metalImage: HTMLImage
     (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2,
     (keypointMap.left_ear.y + keypointMap.right_ear.y) / 2,
   );
-
-  ctx.closePath();
-  // shoulders and arms
-
-  drawTorso(ctx, keypointMap, metalImage);
-  ctx.beginPath();
-  // lower body
-
-  drawLimb(keypointMap.left_hip, keypointMap.left_knee, ctx, metalImage, 3);
-
-  ctx.moveTo(keypointMap.left_knee.x, keypointMap.left_knee.y);
-  ctx.lineTo(keypointMap.left_ankle.x, keypointMap.left_ankle.y);
-
-  drawLimb(keypointMap.right_hip, keypointMap.right_knee, ctx, metalImage, 3);
-
-  ctx.moveTo(keypointMap.right_knee.x, keypointMap.right_knee.y);
-  ctx.lineTo(keypointMap.right_ankle.x, keypointMap.right_ankle.y);
-
-  ctx.strokeStyle = 'red';
   ctx.stroke();
+}
+
+function drawHead(
+  helmetImage: HTMLImageElement,
+  ctx: CanvasRenderingContext2D,
+  keypointMap: KeypointMap,
+  isLeft: boolean,
+) {
+  const headWidth = 7;
+  const headHeight = helmetImage.height * (headWidth / helmetImage.width);
+  ctx.translate(
+    (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2,
+    (keypointMap.left_ear.y + keypointMap.right_ear.y) / 2,
+  );
+
+  if (!isLeft) {
+    ctx.translate(0, 0);
+    ctx.scale(-1, 1);
+  }
+
+  ctx.fillStyle = 'orange';
+  ctx.fillRect(-headWidth / 4, 0, headWidth / 2, headHeight / 2);
+  //ctx.fillRect(-headWidth / 2, -headHeight / 2, headWidth, headHeight);
+  ctx.drawImage(helmetImage, -headWidth / 2, -headHeight / 2, headWidth, headHeight);
+  ctx.resetTransform();
 }
 
 function drawSword(
