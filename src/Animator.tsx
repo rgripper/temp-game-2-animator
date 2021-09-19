@@ -48,6 +48,11 @@ export type KeypointMap = Record<
   Point
 >;
 
+export type AugmentedKeypointMap = KeypointMap & {
+  left_hand: Point;
+  right_hand: Point;
+};
+
 function FramePose({ pose }: { pose: Pose }) {
   const originalKeypointMap = getKeypointMap(pose);
   const keypointMap = normalizeMap(originalKeypointMap);
@@ -226,7 +231,23 @@ export function getKeypointMap(pose: Pose): KeypointMap {
   ) as unknown as KeypointMap;
 }
 
-function normalizeMap(keypointMap: KeypointMap): KeypointMap {
+export function augmentKeypointMap(keypointMap: KeypointMap): AugmentedKeypointMap {
+  function getHandPoint(wrist: Point, elbow: Point): Point {
+    const handToLowerArmRatio = 0.17;
+    return {
+      x: wrist.x + (wrist.x - elbow.x) * handToLowerArmRatio,
+      y: wrist.y + (wrist.y - elbow.y) * handToLowerArmRatio,
+    };
+  }
+
+  return {
+    ...keypointMap,
+    left_hand: getHandPoint(keypointMap.left_wrist, keypointMap.left_elbow),
+    right_hand: getHandPoint(keypointMap.right_wrist, keypointMap.right_elbow),
+  };
+}
+
+export function normalizeMap(keypointMap: KeypointMap): KeypointMap {
   const torsoRect = {
     x1: (keypointMap.left_shoulder.x + keypointMap.left_hip.x) / 2,
     x2: (keypointMap.right_shoulder.x + keypointMap.right_hip.x) / 2,

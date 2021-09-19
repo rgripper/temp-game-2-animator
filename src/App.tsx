@@ -6,7 +6,6 @@ import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-cpu';
 import { Recorder, RecorderResult } from './Recorder';
 import { FrameEstimator, Pose } from './FrameEstimator';
-import { Animator } from './Animator';
 import { FrameListPreview } from './FrameListPreview';
 import posesJson from './poses.json';
 import { Dresser } from './Dresser';
@@ -19,12 +18,19 @@ function App({}: AppProps) {
 
   const [poses, setPoses] = useState<Pose[] | null>(posesJson);
 
+  const [poseIndex, setPoseIndex] = useState(7);
+  const pose = poses && poses[poseIndex];
   useEffect(() => {
     if (poses) {
       window.localStorage.setItem('poses', JSON.stringify(poses));
     }
   }, [poses]);
 
+  useEffect(() => {
+    setInterval(() => {
+      poses && setPoseIndex((p) => (p > poses!.length - 2 ? 0 : p + 1));
+    }, 500);
+  }, []);
   return !poses ? (
     <>
       {!recorderResult && (
@@ -40,7 +46,7 @@ function App({}: AppProps) {
   ) : (
     <>
       {/* {poses && <Animator poses={poses} />} */}
-      {poses && <Dresser pose={poses[5]} />}
+      {pose && <Dresser pose={pose} />}
     </>
   );
 }

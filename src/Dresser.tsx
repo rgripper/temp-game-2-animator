@@ -1,6 +1,6 @@
 import type { Point, Pose } from './FrameEstimator';
 import React, { useEffect, useState } from 'react';
-import { getKeypointMap, KeypointMap } from './Animator';
+import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap } from './Animator';
 import metalSrc from './metal.jpg';
 import swordSrc from './sword3.png';
 import helmetSrc from './helmet.png';
@@ -36,21 +36,21 @@ function renderPose(
   helmetImage: HTMLImageElement,
 ) {
   const ctx = canvas.getContext('2d')!;
-
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, 1000, 1000);
   ctx.imageSmoothingEnabled = false;
-  const keypointMap = getKeypointMap(scaleDown(pose));
+  const keypointMap_ = normalizeMap(getKeypointMap(scaleDown(pose)));
+  //keypointMap_.right_wrist.x += 50;
+  const keypointMap = augmentKeypointMap(keypointMap_);
 
-  const isLeft = (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2 > keypointMap.nose.x;
-
-  const handSize = 3;
-  const handHorizontalOffset = isLeft ? -handSize : handSize; // todo depends on whether the character is on the right or left
+  ctx.save();
   ctx.fillStyle = 'orange';
-  const rightHandPosition = { x: keypointMap.right_wrist.x + handHorizontalOffset, y: keypointMap.right_wrist.y };
-  ctx.fillRect(rightHandPosition.x + handSize / 2, rightHandPosition.y - handSize / 2, handSize, handSize);
-  const leftHandPosition = { x: keypointMap.left_wrist.x + handHorizontalOffset, y: keypointMap.left_wrist.y };
-  ctx.fillRect(leftHandPosition.x + handSize / 2, leftHandPosition.y - handSize / 2, handSize, handSize);
+  ctx.fillRect(keypointMap.right_hand.x - 2, keypointMap.right_hand.y - 2, 4, 4);
+  ctx.fillRect(keypointMap.left_hand.x - 2, keypointMap.left_hand.y - 2, 4, 4);
+  ctx.restore();
 
-  drawSword(keypointMap, rightHandPosition, ctx, swordImage);
+  const angleRad = getPerpendicularAngleRad(keypointMap.right_elbow, keypointMap.right_wrist);
+  drawSword(keypointMap.right_hand, angleRad, ctx, swordImage);
 
   ctx.fillStyle = '#770000aa';
   // head
@@ -64,7 +64,7 @@ function renderPose(
 
   drawNeck(ctx, keypointMap);
 
-  drawHead(helmetImage, ctx, keypointMap, isLeft);
+  drawHead(helmetImage, ctx, keypointMap);
 
   // shoulders and arms
 
@@ -99,12 +99,9 @@ function drawNeck(ctx: CanvasRenderingContext2D, keypointMap: KeypointMap) {
   ctx.stroke();
 }
 
-function drawHead(
-  helmetImage: HTMLImageElement,
-  ctx: CanvasRenderingContext2D,
-  keypointMap: KeypointMap,
-  isLeft: boolean,
-) {
+function drawHead(helmetImage: HTMLImageElement, ctx: CanvasRenderingContext2D, keypointMap: KeypointMap) {
+  const isLeft = (keypointMap.left_ear.x + keypointMap.right_ear.x) / 2 > keypointMap.nose.x;
+
   const headWidth = 7;
   const headHeight = helmetImage.height * (headWidth / helmetImage.width);
   ctx.translate(
@@ -124,25 +121,19 @@ function drawHead(
   ctx.resetTransform();
 }
 
-function drawSword(
-  keypointMap: KeypointMap,
-  handPosition: Point,
-  ctx: CanvasRenderingContext2D,
-  weaponImage: HTMLImageElement,
-) {
-  const angleRad = getPerpendicularAngleRad(keypointMap.right_elbow, keypointMap.right_wrist);
-
+function drawSword(hand: Point, angleRad: number, ctx: CanvasRenderingContext2D, weaponImage: HTMLImageElement) {
   const width = 8;
   const height = (weaponImage.height * width) / weaponImage.width;
-  const holdingPoint = { x: width * 0.3, y: height * 0.75 };
+
+  const weaponHoldingPoint = { x: width * 0.5, y: height * 0.82 };
 
   ctx.fillStyle = 'red';
 
-  ctx.translate(handPosition.x, handPosition.y);
+  ctx.translate(hand.x, hand.y);
   ctx.rotate(angleRad);
 
-  // ctx.fillRect(-holdingPoint.x, -holdingPoint.y, width, height);
-  ctx.drawImage(weaponImage, -holdingPoint.x, -holdingPoint.y, width, height);
+  // ctx.fillRect(-weaponHoldingPoint.x, -weaponHoldingPoint.y, width, height);
+  ctx.drawImage(weaponImage, -weaponHoldingPoint.x, -weaponHoldingPoint.y, width, height);
 
   ctx.resetTransform();
 
