@@ -1,6 +1,6 @@
 import type { Pose } from './FrameEstimator';
 import React, { useEffect, useState } from 'react';
-import { getKeypointMap } from './Animator';
+import { getKeypointMap } from './bodyMath';
 
 export function Dresser({ pose }: { pose: Pose }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);

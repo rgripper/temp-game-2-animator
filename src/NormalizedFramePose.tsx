@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import React from 'react';
-import type { KeypointMap } from './Animator';
+import type { KeypointMap } from './bodyMath';
 import type { Pose } from './FrameEstimator';
 import helmetUrl from './helmet.png';
 import swordUrl from './sword3.png';
@@ -192,7 +192,7 @@ function Limb({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: numb
   );
 }
 
-export function getKeypointMap(pose: Pose): KeypointMap {
+function getKeypointMap(pose: Pose): KeypointMap {
   return Object.fromEntries(
     pose.keypoints.map((keypoint) => [keypoint.name, { x: keypoint.x, y: keypoint.y, z: keypoint.z }]),
   ) as unknown as KeypointMap;

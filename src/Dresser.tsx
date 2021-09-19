@@ -1,6 +1,6 @@
 import type { Point, Pose } from './FrameEstimator';
 import React, { useEffect, useState } from 'react';
-import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap } from './Animator';
+import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap } from './bodyMath';
 import metalSrc from './metal.jpg';
 import swordSrc from './sword3.png';
 import helmetSrc from './helmet.png';
