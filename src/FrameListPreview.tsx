@@ -7,11 +7,11 @@ export function FrameListPreview({
   frames: ImageData[];
   onSelect: (frames: ImageData[]) => void;
 }) {
-  const [selectedFrameIndices, setSelectedFrameIndices] = useState<number[]>([]);
+  const [selectedFrameIndices, setSelectedFrameIndices] = useState<number[]>(frames.map((_, i) => i));
 
   return (
     <div>
-      <ul style={{ display: 'flex' }}>
+      <ul style={{ display: 'flex', width: '800px', flexWrap: 'wrap' }}>
         {frames.map((frame, i) => (
           <li
             key={i}

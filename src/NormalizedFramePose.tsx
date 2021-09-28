@@ -17,8 +17,8 @@ const bodyStyles = css`
 `;
 
 export function NormalizedFramePose({ pose }: { pose: Pose }) {
-  const originalKeypointMap = getKeypointMap(pose);
-  const { keypointMap, torsoRect } = normalizeMap(originalKeypointMap);
+  const keypointMap = getKeypointMap(pose);
+  const { torsoRect } = normalizeMap(keypointMap);
 
   return (
     <svg className={bodyStyles} viewBox="0 0 800 800" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
@@ -200,10 +200,10 @@ function getKeypointMap(pose: Pose): KeypointMap {
 
 function normalizeMap(keypointMap: KeypointMap): { keypointMap: KeypointMap; torsoRect: any } {
   const torsoRaw = {
-    x1: (keypointMap.left_shoulder.x + keypointMap.left_hip.x) / 2,
-    x2: (keypointMap.right_shoulder.x + keypointMap.right_hip.x) / 2,
-    y1: (keypointMap.left_shoulder.y + keypointMap.right_shoulder.y) / 2,
-    y2: (keypointMap.left_hip.y + keypointMap.right_hip.y) / 2,
+    x1: keypointMap.left_shoulder.x,
+    x2: keypointMap.right_shoulder.x,
+    y1: keypointMap.left_shoulder.y,
+    y2: keypointMap.right_shoulder.y,
   };
 
   const torsoAvgX = (torsoRaw.x1 + torsoRaw.x2) / 2;

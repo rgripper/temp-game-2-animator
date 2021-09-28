@@ -5,7 +5,7 @@ import type { Pose } from './FrameEstimator';
 import helmetUrl from './helmet.png';
 import { NormalizedFramePose } from './NormalizedFramePose';
 
-export function Animator({ poses }: { poses: Pose[] }) {
+export function FrameSelect({ poses }: { poses: Pose[] }) {
   return (
     <>
       {poses.map((x) => (

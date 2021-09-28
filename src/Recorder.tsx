@@ -36,6 +36,15 @@ function useCountdown(seconds: number): number {
   return countdown;
 }
 
+type RecordingParams = {
+  context: OffscreenCanvasRenderingContext2D;
+  video: HTMLVideoElement;
+  resolution: {
+    width: number;
+    height: number;
+  };
+};
+
 export function Recorder({ onComplete, countdownSeconds, durationSeconds, framesPerSec }: AppProps) {
   // const videoRef = useRef<HTMLVideoElement | null>(null)
   const countdown = useCountdown(countdownSeconds);
@@ -44,19 +53,13 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
 
   const [isRecordingComplete, setIsRecordingComplete] = useState(false);
 
-  const [context, setContext] = useState<OffscreenCanvasRenderingContext2D | null>(null);
-  const [video, setVideo] = useState<HTMLVideoElement | null>(null);
-
-  const [resolution, setResolution] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
+  const [recordingParams, setRecordingParams] = useState<RecordingParams | null>(null);
 
   useEffect(() => {
-    if (isRecordingComplete) {
-      onComplete({ frames, resolution: resolution! });
+    if (recordingParams && isRecordingComplete) {
+      onComplete({ frames, resolution: recordingParams.resolution });
     }
-  }, [isRecordingComplete, frames]);
+  }, [recordingParams, isRecordingComplete, frames]);
 
   const setVideoAndCanvas = useCallback((video: HTMLVideoElement | null) => {
     if (!video) return;
@@ -71,7 +74,8 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
   }, []);
 
   useInterval(async (intervalId) => {
-    if (!resolution || !context || !video) return;
+    if (!recordingParams || countdown > 0) return;
+    const { resolution, context, video } = recordingParams;
     context.clearRect(0, 0, resolution.width, resolution.height);
     context.drawImage(video, 0, 0, resolution.width, resolution.height);
     const frame = context.getImageData(0, 0, resolution.width, resolution.height);
@@ -87,9 +91,9 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
     });
   }, 1000 / framesPerSec);
 
-  const startRecording = useCallback(async (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+  const prepareRecording = useCallback(async (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
     const video = event.currentTarget;
-    const inputResolution = {
+    const resolution = {
       width: video.videoWidth,
       height: video.videoHeight,
     };
@@ -98,32 +102,63 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
       throw new Error('Set gfx.offscreencanvas.enabled=true in about:config');
     }
 
-    const offscreen = new OffscreenCanvas(inputResolution.width, inputResolution.height);
+    const offscreen = new OffscreenCanvas(resolution.width, resolution.height);
     const context = offscreen.getContext('2d');
     if (!context) {
       throw new Error('context is null');
     }
 
-    video.width = inputResolution.width;
-    video.height = inputResolution.height;
+    video.width = resolution.width;
+    video.height = resolution.height;
 
-    setResolution(inputResolution);
-    setContext(context);
-    setVideo(video);
+    setRecordingParams({
+      resolution,
+      context,
+      video,
+    });
   }, []);
 
   return (
-    <div className="App" style={{ position: 'relative' }}>
-      {countdown ? (
-        <div style={{ position: 'absolute', fontSize: 500, textAlign: 'center', width: '100%', height: '100%' }}>
+    <div
+      className="App"
+      style={{
+        height: '100%',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <video id="vid" ref={setVideoAndCanvas} onLoadedData={prepareRecording} autoPlay></video>
+      {countdown > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            backgroundColor: 'transparent',
+            fontSize: 500,
+            top: 0,
+            left: 0,
+            textAlign: 'center',
+            width: '100%',
+            height: '100%',
+          }}
+        >
           {countdown}
         </div>
-      ) : (
-        <>
-          <video id="vid" ref={setVideoAndCanvas} onLoadedData={startRecording} autoPlay></video>
-          <div>{isRecordingComplete ? 'Done' : `Recording ${frames.length}/${durationSeconds * framesPerSec}`}</div>
-        </>
       )}
+      <div
+        style={{
+          position: 'absolute',
+          backgroundColor: 'transparent',
+          top: 0,
+          left: 0,
+          textAlign: 'center',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        {isRecordingComplete ? 'Done' : `Recording ${frames.length}/${durationSeconds * framesPerSec}`}
+      </div>
     </div>
   );
 }
