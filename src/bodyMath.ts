@@ -160,19 +160,20 @@ export type AugmentedKeypointMap = KeypointMap & {
 };
 
 function getOffset(keypointMap: KeypointMap, referencePoint: Point) {
-  const currentPoint = {
+  const currentCenter = {
     x: (keypointMap.left_hip.x + keypointMap.right_hip.x) / 2,
     y: (keypointMap.left_hip.y + keypointMap.right_hip.y) / 2,
   };
 
   return {
-    x: currentPoint.x - referencePoint.x,
-    y: currentPoint.y - referencePoint.y,
+    x: referencePoint.x - currentCenter.x,
+    y: referencePoint.y - currentCenter.y,
   };
 }
 
 export function stabilizeBody(keypointMap: KeypointMap, referencePoint: Point): KeypointMap {
   const offset = getOffset(keypointMap, referencePoint);
+  // console.log(offset);
   return (Object.keys(keypointMap) as (keyof KeypointMap)[]).reduce(
     (acc, key) => ({
       ...acc,

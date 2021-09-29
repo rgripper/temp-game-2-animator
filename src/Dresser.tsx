@@ -1,6 +1,6 @@
 import type { Point, Pose } from './FrameEstimator';
 import React, { useEffect, useState } from 'react';
-import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap } from './bodyMath';
+import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap, stabilizeBody } from './bodyMath';
 import metalSrc from './metal.jpg';
 import swordSrc from './sword3.png';
 import helmetSrc from './helmet.png';
@@ -40,8 +40,11 @@ function renderPose(
   ctx.fillRect(0, 0, 1000, 1000);
   ctx.imageSmoothingEnabled = false;
   const keypointMap_ = normalizeMap(getKeypointMap(scaleDown(pose)));
+
+  const stabilizedKeypointMap = stabilizeBody(keypointMap_, { x: canvas.width / 2, y: canvas.height * 0.75 });
+  console.log(stabilizedKeypointMap);
   //keypointMap_.right_wrist.x += 50;
-  const keypointMap = augmentKeypointMap(keypointMap_);
+  const keypointMap = augmentKeypointMap(stabilizedKeypointMap);
 
   ctx.save();
   ctx.fillStyle = 'orange';

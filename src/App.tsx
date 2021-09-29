@@ -18,7 +18,7 @@ function App({}: AppProps) {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(null);
   const [selectedFrames, setSelectedFrames] = useState<ImageData[] | null>(null);
 
-  const [poses, setPoses] = useState<Pose[] | null>(null);
+  const [poses, setPoses] = useState<Pose[] | null>(posesJson);
 
   const [poseIndex, setPoseIndex] = useState(0);
   const pose = poses && poses[poseIndex];
