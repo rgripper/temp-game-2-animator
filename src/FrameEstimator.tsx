@@ -41,20 +41,18 @@ export function FrameEstimator({
         });
         setPoses(frames.map(() => null));
 
-        const allPoses = await Promise.all(
-          frames.map(async (frame, frameIndex) => {
-            const [currentPose] = await detector.estimatePoses(frame, {
-              flipHorizontal: false,
-              maxPoses: 1,
-            });
+        const allPosesPromises = frames.map(async (frame, frameIndex) => {
+          const [pose] = await detector.estimatePoses(frame, {
+            flipHorizontal: false,
+            maxPoses: 1,
+          });
 
-            setPoses((poses) => poses.map((pose, poseIndex) => (poseIndex === frameIndex ? currentPose : pose)));
+          return { pose, frameIndex };
+        });
 
-            return currentPose;
-          }),
-        );
-
-        console.log(JSON.stringify(allPoses));
+        for await (const { frameIndex, pose: currentPose } of allPosesPromises) {
+          setPoses((poses) => poses.map((pose, poseIndex) => (poseIndex === frameIndex ? currentPose : pose)));
+        }
       } catch (error) {
         console.error(error);
       }

@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { getKeypointMap, stabilizeBody } from './bodyMath';
 import type { Pose } from './FrameEstimator';
 
-export function FrameEstimationDisplayList({ poses, frames }: { poses: Pose[]; frames: ImageData[] }) {
+export function FrameEstimationDisplayList({ poses, frames }: { poses: Pose[] | null; frames: ImageData[] }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-      {poses.map((x, i) => (
-        <FrameEstimationDisplay pose={x} frame={frames[i]} />
+      {frames.map((x, i) => (
+        <FrameEstimationDisplay pose={poses?.[i]} frame={frames[i]} />
       ))}
     </div>
   );
 }
 
-function FrameEstimationDisplay({ pose, frame }: { pose: Pose; frame: ImageData }) {
+function FrameEstimationDisplay({ pose, frame }: { pose: Pose | undefined; frame: ImageData }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   useEffect(() => {
     if (!canvas) {
@@ -28,26 +28,31 @@ function FrameEstimationDisplay({ pose, frame }: { pose: Pose; frame: ImageData 
     scaleCanvas(canvas, ctx, 100, frame);
     ctx.drawImage(offscreen, 0, 0);
 
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'yellow';
+    if (pose) {
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = 'yellow';
 
-    const keypointMap = getKeypointMap(pose);
+      const keypointMap = getKeypointMap(pose);
 
-    const stabilizedKeypointMap = stabilizeBody(keypointMap, { x: frame.width / 2, y: frame.height * 0.75 });
+      const stabilizedKeypointMap = stabilizeBody(keypointMap, { x: frame.width / 2, y: frame.height * 0.75 });
 
-    ctx.moveTo(stabilizedKeypointMap.left_shoulder.x, stabilizedKeypointMap.left_shoulder.y);
-    ctx.lineTo(stabilizedKeypointMap.right_shoulder.x, stabilizedKeypointMap.right_shoulder.y);
+      ctx.moveTo(stabilizedKeypointMap.left_shoulder.x, stabilizedKeypointMap.left_shoulder.y);
+      ctx.lineTo(stabilizedKeypointMap.left_elbow.x, stabilizedKeypointMap.left_elbow.y);
 
-    ctx.moveTo(stabilizedKeypointMap.left_shoulder.x, stabilizedKeypointMap.left_shoulder.y);
-    ctx.lineTo(stabilizedKeypointMap.right_shoulder.x, stabilizedKeypointMap.right_shoulder.y);
+      ctx.moveTo(stabilizedKeypointMap.right_shoulder.x, stabilizedKeypointMap.right_shoulder.y);
+      ctx.lineTo(stabilizedKeypointMap.right_elbow.x, stabilizedKeypointMap.right_elbow.y);
 
-    ctx.moveTo(stabilizedKeypointMap.left_knee.x, stabilizedKeypointMap.left_knee.y);
-    ctx.lineTo(stabilizedKeypointMap.left_ankle.x, stabilizedKeypointMap.left_ankle.y);
+      ctx.moveTo(stabilizedKeypointMap.left_shoulder.x, stabilizedKeypointMap.left_shoulder.y);
+      ctx.lineTo(stabilizedKeypointMap.right_shoulder.x, stabilizedKeypointMap.right_shoulder.y);
 
-    ctx.moveTo(stabilizedKeypointMap.right_knee.x, stabilizedKeypointMap.right_knee.y);
-    ctx.lineTo(stabilizedKeypointMap.right_ankle.x, stabilizedKeypointMap.right_ankle.y);
+      ctx.moveTo(stabilizedKeypointMap.left_knee.x, stabilizedKeypointMap.left_knee.y);
+      ctx.lineTo(stabilizedKeypointMap.left_ankle.x, stabilizedKeypointMap.left_ankle.y);
 
-    ctx.stroke();
+      ctx.moveTo(stabilizedKeypointMap.right_knee.x, stabilizedKeypointMap.right_knee.y);
+      ctx.lineTo(stabilizedKeypointMap.right_ankle.x, stabilizedKeypointMap.right_ankle.y);
+
+      ctx.stroke();
+    }
   }, [canvas, pose, frame]);
 
   return <canvas ref={setCanvas} />;
