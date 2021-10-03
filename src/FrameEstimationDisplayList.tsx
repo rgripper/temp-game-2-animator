@@ -6,7 +6,7 @@ export function FrameEstimationDisplayList({ poses, frames }: { poses: Pose[] | 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
       {frames.map((x, i) => (
-        <FrameEstimationDisplay pose={poses?.[i]} frame={frames[i]} />
+        <FrameEstimationDisplay key={i} pose={poses?.[i]} frame={frames[i]} />
       ))}
     </div>
   );

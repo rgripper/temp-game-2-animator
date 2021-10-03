@@ -1,11 +1,7 @@
 import React from 'react';
-import * as poseDetection from '@tensorflow-models/pose-detection';
+import type * as poseDetection from '@tensorflow-models/pose-detection';
 import { useEffect, useState } from 'react';
-import type { RecorderResult } from './Recorder';
-import '@tensorflow/tfjs-converter';
-import '@tensorflow/tfjs-core';
-import '@tensorflow/tfjs-backend-webgl';
-// import '@tensorflow/tfjs-backend-cpu';
+import * as Comlink from 'comlink';
 
 export type Pose = poseDetection.Pose;
 export type Keypoint = poseDetection.Keypoint;
@@ -34,24 +30,22 @@ export function FrameEstimator({
 
   useEffect(() => {
     async function detect() {
+      const worker = new Worker(new URL('./detector.js', import.meta.url), { type: 'module' });
+      const detector = Comlink.wrap(worker);
+
       try {
-        const detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, {
-          modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
-          enableSmoothing: true,
-        });
         setPoses(frames.map(() => null));
 
-        const allPosesPromises = frames.map(async (frame, frameIndex) => {
-          const [pose] = await detector.estimatePoses(frame, {
+        let frameIndex = 0;
+        for (const frame of frames) {
+          const currentPose = await (detector as any).estimateFrame(frame, {
             flipHorizontal: false,
             maxPoses: 1,
           });
 
-          return { pose, frameIndex };
-        });
-
-        for await (const { frameIndex, pose: currentPose } of allPosesPromises) {
-          setPoses((poses) => poses.map((pose, poseIndex) => (poseIndex === frameIndex ? currentPose : pose)));
+          let frameIndex_ = frameIndex;
+          setPoses((poses) => poses.map((pose, poseIndex) => (poseIndex === frameIndex_ ? currentPose : pose)));
+          frameIndex++;
         }
       } catch (error) {
         console.error(error);

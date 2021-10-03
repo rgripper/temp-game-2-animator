@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import '@tensorflow/tfjs-converter';
-import '@tensorflow/tfjs-core';
-import '@tensorflow/tfjs-backend-webgl';
 import { Recorder, RecorderResult } from './Recorder';
 import { FrameEstimator, Pose } from './FrameEstimator';
 import { FrameListPreview } from './FrameListPreview';
@@ -34,7 +31,7 @@ function App({}: AppProps) {
   return (
     <div style={{ display: 'flex', height: '100vh', alignItems: 'center', flexDirection: 'column' }}>
       {!recorderResult && (
-        <Recorder onComplete={setRecorderResult} countdownSeconds={5} durationSeconds={3} framesPerSec={10} />
+        <Recorder onComplete={setRecorderResult} countdownSeconds={1} durationSeconds={1} framesPerSec={10} />
       )}
       {recorderResult && (
         <div style={{ width: '800px' }}>
