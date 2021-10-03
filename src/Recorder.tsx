@@ -65,7 +65,7 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
     if (!video) return;
 
     const constraints = {
-      video: true,
+      video: { facingMode: "environment" },
     };
 
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
