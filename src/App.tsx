@@ -30,7 +30,7 @@ function App({}: AppProps) {
   return (
     <div style={{ display: 'flex', height: '100vh', alignItems: 'center', flexDirection: 'column' }}>
       {!recorderResult && (
-        <Recorder onComplete={setRecorderResult} countdownSeconds={1} durationSeconds={1} framesPerSec={10} />
+        <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={10} />
       )}
       {recorderResult && (
         <div style={{ width: '800px' }}>
