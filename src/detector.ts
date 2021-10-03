@@ -2,7 +2,7 @@ import './worker-tf-fix';
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-converter';
-import '@tensorflow/tfjs-backend-cpu';
+import '@tensorflow/tfjs-backend-webgl';
 import * as Comlink from 'comlink';
 
 await tf.ready();

@@ -1,4 +1,4 @@
-import type { Point, Pose } from './FrameEstimator';
+import type { Point, Pose } from './useEstimator';
 
 export function getKeypointMap(pose: Pose): KeypointMap {
   return Object.fromEntries(

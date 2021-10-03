@@ -1,4 +1,4 @@
-import type { Point, Pose } from './FrameEstimator';
+import type { Point, Pose } from './useEstimator';
 import React, { useEffect, useState } from 'react';
 import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap, stabilizeBody } from './bodyMath';
 import metalSrc from './metal.jpg';
@@ -18,7 +18,7 @@ export function Dresser({ pose }: { pose: Pose }) {
     }
   }, [canvas, pose, metalImage, swordImage, helmetImage]);
 
-  return <canvas style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} width={800} height={600} />;
+  return <canvas style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} width={200} height={200} />;
 }
 
 function scaleDown(pose: Pose): Pose {
@@ -36,14 +36,14 @@ function renderPose(
   helmetImage: HTMLImageElement,
 ) {
   const ctx = canvas.getContext('2d')!;
+
   ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, 1000, 1000);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.imageSmoothingEnabled = false;
   const keypointMap_ = normalizeMap(getKeypointMap(scaleDown(pose)));
 
   const stabilizedKeypointMap = stabilizeBody(keypointMap_, { x: canvas.width / 2, y: canvas.height * 0.75 });
-  console.log(stabilizedKeypointMap);
-  //keypointMap_.right_wrist.x += 50;
+
   const keypointMap = augmentKeypointMap(stabilizedKeypointMap);
 
   ctx.save();

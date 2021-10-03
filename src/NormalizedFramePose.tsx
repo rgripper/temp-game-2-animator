@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import React from 'react';
 import type { KeypointMap } from './bodyMath';
-import type { Pose } from './FrameEstimator';
+import type { Pose } from './useEstimator';
 import helmetUrl from './helmet.png';
 import swordUrl from './sword3.png';
 

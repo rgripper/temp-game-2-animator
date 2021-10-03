@@ -1,18 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { getKeypointMap, stabilizeBody } from './bodyMath';
-import type { Pose } from './FrameEstimator';
+import { Pose, useEstimator } from './useEstimator';
 
-export function FrameEstimationDisplayList({ poses, frames }: { poses: Pose[] | null; frames: ImageData[] }) {
+function isDefined<T>(x: T): x is Exclude<T, null | undefined> {
+  return x != null;
+}
+
+export function FrameEstimationDisplayList({
+  frames,
+  onComplete,
+}: {
+  frames: ImageData[];
+  onComplete: (poses: Pose[]) => void;
+}) {
+  const poses = useEstimator(frames);
+  useEffect(() => {
+    if (poses.every(isDefined)) {
+      onComplete(poses);
+    }
+  }, [poses]);
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap' }}>
       {frames.map((x, i) => (
-        <FrameEstimationDisplay key={i} pose={poses?.[i]} frame={frames[i]} />
+        <FrameEstimationDisplay key={i} pose={poses[i]} frame={frames[i]} />
       ))}
     </div>
   );
 }
 
-function FrameEstimationDisplay({ pose, frame }: { pose: Pose | undefined; frame: ImageData }) {
+function FrameEstimationDisplay({ pose, frame }: { pose: Pose | null; frame: ImageData }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   useEffect(() => {
     if (!canvas) {
@@ -70,7 +86,7 @@ function FrameEstimationDisplay({ pose, frame }: { pose: Pose | undefined; frame
     }
   }, [canvas, pose, frame]);
 
-  return <canvas ref={setCanvas} />;
+  return <canvas ref={setCanvas} style={{ filter: pose ? undefined : 'grayscale(1)' }} />;
 }
 
 function scaleCanvas(
