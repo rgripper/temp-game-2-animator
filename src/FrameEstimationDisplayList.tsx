@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { tw } from 'twind';
 import { getKeypointMap, stabilizeBody } from './bodyMath';
 import { Pose, useEstimator } from './useEstimator';
-
-function isDefined<T>(x: T): x is Exclude<T, null | undefined> {
-  return x != null;
-}
 
 export function FrameEstimationDisplayList({
   frames,
@@ -13,22 +10,30 @@ export function FrameEstimationDisplayList({
   frames: ImageData[];
   onComplete: (poses: Pose[]) => void;
 }) {
-  const poses = useEstimator(frames);
+  const estimationStates = useEstimator(frames);
   useEffect(() => {
-    if (poses.every(isDefined)) {
-      onComplete(poses);
+    if (estimationStates.every((x): x is { pose: Pose; isEstimating: false } => !!x.pose)) {
+      onComplete(estimationStates.map((x) => x.pose));
     }
-  }, [poses]);
+  }, [estimationStates]);
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+    <div className={tw`flex flex-wrap gap-6`}>
       {frames.map((x, i) => (
-        <FrameEstimationDisplay key={i} pose={poses[i]} frame={frames[i]} />
+        <FrameEstimationDisplay key={i} {...estimationStates[i]} frame={frames[i]} />
       ))}
     </div>
   );
 }
 
-function FrameEstimationDisplay({ pose, frame }: { pose: Pose | null; frame: ImageData }) {
+function FrameEstimationDisplay({
+  pose,
+  isEstimating,
+  frame,
+}: {
+  pose: Pose | null;
+  isEstimating: boolean;
+  frame: ImageData;
+}) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   useEffect(() => {
     if (!canvas) {
@@ -41,7 +46,7 @@ function FrameEstimationDisplay({ pose, frame }: { pose: Pose | null; frame: Ima
     draftContext.putImageData(frame, 0, 0);
 
     const ctx = canvas.getContext('2d')!;
-    scaleCanvas(canvas, ctx, 100, frame);
+    scaleCanvas(canvas, ctx, 64, frame);
     ctx.drawImage(offscreen, 0, 0);
 
     if (pose) {
@@ -86,7 +91,20 @@ function FrameEstimationDisplay({ pose, frame }: { pose: Pose | null; frame: Ima
     }
   }, [canvas, pose, frame]);
 
-  return <canvas ref={setCanvas} style={{ filter: pose ? undefined : 'grayscale(1)' }} />;
+  return (
+    <div className={tw`relative`}>
+      <canvas
+        className={tw`border-1 rounded-sm ${pose ? 'border-yellow-500' : 'border-gray-400'}`}
+        ref={setCanvas}
+        style={{ filter: pose ? undefined : 'grayscale(1)' }}
+      />
+      {isEstimating && (
+        <span className={tw`h-full w-full absolute top-0 right-0 grid place-items-center`}>
+          <span className={tw`animate-ping w-2 h-2 inline-flex rounded-full bg-yellow-500`}></span>
+        </span>
+      )}
+    </div>
+  );
 }
 
 function scaleCanvas(

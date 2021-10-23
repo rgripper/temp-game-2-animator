@@ -4,6 +4,9 @@ import { Recorder, RecorderResult } from './Recorder';
 import type { Pose } from './useEstimator';
 import { Dresser } from './Dresser';
 import { FrameEstimationDisplayList } from './FrameEstimationDisplayList';
+import { Button } from './base/buttons';
+import { Input } from './base/inputs';
+import { tw } from 'twind';
 
 type AppProps = {};
 
@@ -28,16 +31,48 @@ function App({}: AppProps) {
     }, 500);
   }, []);
   return (
-    <div style={{ display: 'flex', height: '100vh', alignItems: 'center', flexDirection: 'column' }}>
+    <div
+      className={tw`bg-gray-900`}
+      style={{ display: 'flex', height: '100vh', alignItems: 'center', flexDirection: 'column' }}
+    >
       {!recorderResult && (
         <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={10} />
       )}
       {recorderResult && (
-        <div style={{ width: '800px' }}>
+        <div className={tw`w-2/3`}>
           <FrameEstimationDisplayList frames={recorderResult.frames} onComplete={setPoses} />
+          {poses && <DownloadForm poses={poses} />}
         </div>
       )}
       {pose && <Dresser pose={pose} />}
+    </div>
+  );
+}
+
+function DownloadForm({ poses }: { poses: Pose[] }) {
+  const [name, setName] = useState('');
+  return (
+    <div>
+      <div>
+        <Input type="text" value={name} onChange={(ev) => setName(ev.currentTarget.name)} />
+      </div>
+      <a
+        download="poses.json"
+        onClick={() => {
+          setName('');
+        }}
+        href={
+          'data:text/plain;charset=utf-8,' +
+          encodeURIComponent(
+            JSON.stringify({
+              name,
+              poses,
+            }),
+          )
+        }
+      >
+        <Button>Download</Button>
+      </a>
     </div>
   );
 }
