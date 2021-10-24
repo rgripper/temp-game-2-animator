@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { tw } from 'twind';
-import { Ping } from './base/Ping';
+import { Ping } from '../base/Ping';
 import { Dresser } from './Dresser';
-import type { Pose } from './useEstimator';
+import type { Pose } from '../useEstimator';
 
 export function Animator({ poses }: { poses: Pose[] | null }) {
   const posesRef = useRef<Pose[] | null>(null);

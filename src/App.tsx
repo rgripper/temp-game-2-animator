@@ -6,7 +6,7 @@ import { FrameEstimationDisplayList } from './FrameEstimationDisplayList';
 import { Button } from './base/buttons';
 import { Input } from './base/inputs';
 import { tw } from 'twind';
-import { Animator } from './Animator';
+import { Animator } from './animator/Animator';
 
 type AppProps = {};
 

@@ -65,11 +65,12 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
     if (!video) return;
 
     const constraints = {
-      video: { facingMode: "environment" },
+      video: { facingMode: 'environment' },
     };
 
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
       video.srcObject = stream;
+      video.play();
     });
   }, []);
 
@@ -129,7 +130,7 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
         justifyContent: 'center',
       }}
     >
-      <video id="vid" ref={setVideoAndCanvas} onLoadedData={prepareRecording} autoPlay></video>
+      <video id="vid" ref={setVideoAndCanvas} onLoadedData={prepareRecording}></video>
       {countdown > 0 && (
         <div
           style={{
