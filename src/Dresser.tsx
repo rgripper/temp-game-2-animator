@@ -4,6 +4,7 @@ import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap, stabiliz
 import metalSrc from './metal.jpg';
 import swordSrc from './sword3.png';
 import helmetSrc from './helmet.png';
+import { tw } from 'twind';
 
 export function Dresser({ pose }: { pose: Pose }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -18,7 +19,7 @@ export function Dresser({ pose }: { pose: Pose }) {
     }
   }, [canvas, pose, metalImage, swordImage, helmetImage]);
 
-  return <canvas style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} width={200} height={200} />;
+  return <canvas className={tw`w-full h-full`} style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} />;
 }
 
 function scaleDown(pose: Pose): Pose {
