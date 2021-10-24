@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Recorder, RecorderResult } from './Recorder';
+import { Recorder, RecorderResult } from './recorder/Recorder';
 import type { Pose } from './useEstimator';
 import { FrameEstimationDisplayList } from './FrameEstimationDisplayList';
 import { Button } from './base/buttons';
@@ -21,10 +21,7 @@ function App({}: AppProps) {
   };
 
   return (
-    <div
-      className={tw`bg-gray-900`}
-      style={{ display: 'flex', height: '100vh', alignItems: 'center', flexDirection: 'column' }}
-    >
+    <div className={tw`bg-gray-900 flex flex-col items-center`} style={{ height: '100vh' }}>
       {!recorderResult && (
         <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={10} />
       )}
