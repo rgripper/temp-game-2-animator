@@ -21,7 +21,11 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
   });
 
   useEffect(() => {
-    if (video && isComplete) {
+    if (camera && video && isComplete) {
+      camera
+        .getTracks()
+        .filter((track) => track.readyState == 'live')
+        .forEach((track) => track.stop());
       onComplete({ frames, resolution: { width: video.videoWidth, height: video.videoHeight } });
     }
   }, [video, isComplete, frames]);
