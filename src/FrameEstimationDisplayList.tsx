@@ -18,7 +18,7 @@ export function FrameEstimationDisplayList({
     }
   }, [estimationStates]);
   return (
-    <div className={tw`flex flex-wrap gap-6`}>
+    <div className={tw`flex flex-wrap gap-4`}>
       {frames.map((x, i) => (
         <FrameEstimationDisplay key={i} {...estimationStates[i]} frame={frames[i]} />
       ))}
