@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Ping } from '../base/Ping';
+import { tw } from 'twind';
 
 export function Countdown({ seconds, onCompleted }: any) {
   const countdown = useCountdown(seconds);
@@ -9,19 +11,10 @@ export function Countdown({ seconds, onCompleted }: any) {
   }, [countdown]);
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        backgroundColor: 'transparent',
-        fontSize: 400,
-        top: 0,
-        left: 0,
-        textAlign: 'center',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      {countdown}
+    <div className={tw`absolute top-0 left-0 w-full h-full flex justify-center items-center bg-transparent gap-8`}>
+      {new Array(countdown).fill(null).map(() => (
+        <span className={tw`w-8 h-8 rounded-full bg-yellow-500`}></span>
+      ))}
     </div>
   );
 }

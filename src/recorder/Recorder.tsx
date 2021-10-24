@@ -34,7 +34,7 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
     <div className={tw`h-full w-full flex flex-col justify-center items-center`}>
       {video && (
         <div className={tw`h-2 bg-gray-700`} style={{ width: video.width }}>
-          <div className={tw`h-2 transition-width bg-blue-500`} style={{ width: `${progress * 100}%` }}></div>
+          <div className={tw`h-2 transition-width bg-yellow-500`} style={{ width: `${progress * 100}%` }}></div>
         </div>
       )}
       <div className={tw`relative grid place-items-center`}>
