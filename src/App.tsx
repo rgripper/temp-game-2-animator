@@ -36,7 +36,7 @@ function DownloadForm(props: { frames: ImageData[]; onSubmit: (values: { poses: 
   const canSubmit = !!name && !!poses;
   return (
     <form
-      className={tw`w-2/3 flex flex-col items-center`}
+      className={tw`w-3/4 flex flex-col items-center`}
       onSubmit={() => canSubmit && props.onSubmit({ name, poses })}
     >
       <div className={tw`mt-8`}>
