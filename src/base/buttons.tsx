@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import React from 'react';
-import { tw } from 'twind';
 
 export function Button({
   size = 'md',
@@ -12,7 +11,7 @@ export function Button({
         <button
           {...props}
           className={classNames(
-            tw`h-10 px-5 text-gray-100 transition-colors duration-150 bg-yellow-500 rounded-xl focus:outline-none focus:ring focus:ring-yellow-300 hover:bg-yellow-600`,
+            `h-10 px-5 text-gray-100 transition-colors duration-150 bg-yellow-500 rounded-xl focus:outline-none focus:ring focus:ring-yellow-300 hover:bg-yellow-600`,
             props.className,
           )}
         />
@@ -23,7 +22,7 @@ export function Button({
         <button
           {...props}
           className={classNames(
-            tw`h-12 px-6 text-lg text-gray-100 transition-colors duration-150 bg-yellow-500 rounded-xl focus:outline-none focus:ring focus:ring-yellow-300 hover:bg-yellow-600`,
+            `h-12 px-6 text-lg text-gray-100 transition-colors duration-150 bg-yellow-500 rounded-xl focus:outline-none focus:ring focus:ring-yellow-300 hover:bg-yellow-600`,
             props.className,
           )}
         />

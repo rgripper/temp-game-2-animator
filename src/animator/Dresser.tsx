@@ -1,10 +1,9 @@
 import type { Point, Pose } from '../useEstimator';
 import React, { useEffect, useState } from 'react';
 import { augmentKeypointMap, getKeypointMap, KeypointMap, normalizeMap, stabilizeBody } from '../bodyMath';
-import metalSrc from './metal.jpg';
-import swordSrc from './sword3.png';
-import helmetSrc from './helmet.png';
-import { tw } from 'twind';
+import metalSrc from '../assets/metal.jpg';
+import swordSrc from '../assets/sword3.png';
+import helmetSrc from '../assets/helmet.png';
 
 export function Dresser({ pose }: { pose: Pose }) {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -19,7 +18,7 @@ export function Dresser({ pose }: { pose: Pose }) {
     }
   }, [canvas, pose, metalImage, swordImage, helmetImage]);
 
-  return <canvas className={tw`w-full h-full`} style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} />;
+  return <canvas className={`w-full h-full`} style={{ imageRendering: 'crisp-edges' }} ref={setCanvas} />;
 }
 
 function scaleDown(pose: Pose): Pose {
@@ -205,6 +204,6 @@ function useImage(src: string) {
     const imageElement = new Image();
     imageElement.src = src;
     imageElement.onload = () => setImage(imageElement);
-  }, []);
+  }, [src]);
   return image;
 }

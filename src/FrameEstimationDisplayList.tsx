@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { tw } from 'twind';
 import { Ping } from './base/Ping';
 import { getKeypointMap, stabilizeBody } from './bodyMath';
 import { Pose, useEstimator } from './useEstimator';
@@ -60,7 +59,7 @@ function FrameEstimationDisplay({
   }, [canvas, pose, frame]);
 
   return (
-    <div className={tw`relative`}>
+    <div className={`relative`}>
       <canvas ref={setCanvas} />
       {isEstimating && <Ping size="sm" />}
     </div>

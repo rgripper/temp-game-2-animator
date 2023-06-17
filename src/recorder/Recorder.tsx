@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CameraDisplay } from './CameraDisplay';
 import useInterval from '../useInterval';
 import { Countdown } from './Countdown';
-import { tw } from 'twind';
 
 export type RecorderResult = { frames: ImageData[]; resolution: { width: number; height: number } };
 
@@ -31,13 +30,13 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
   }, [video, isComplete, frames]);
 
   return (
-    <div className={tw`h-full w-full flex flex-col justify-center items-center`}>
+    <div className={`h-full w-full flex flex-col justify-center items-center`}>
       {video && (
-        <div className={tw`h-2 bg-gray-700`} style={{ width: video.width }}>
-          <div className={tw`h-2 transition-width bg-yellow-500`} style={{ width: `${progress * 100}%` }}></div>
+        <div className={`h-2 bg-gray-700`} style={{ width: video.width }}>
+          <div className={`h-2 transition-width bg-yellow-500`} style={{ width: `${progress * 100}%` }}></div>
         </div>
       )}
-      <div className={tw`relative grid place-items-center`}>
+      <div className={`relative grid place-items-center`}>
         {camera && <CameraDisplay source={camera} onReady={setVideo} />}
         {camera && !canRecord && <Countdown seconds={countdownSeconds} onCompleted={() => setCanRecord(true)} />}
       </div>

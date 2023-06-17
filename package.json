@@ -10,8 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "@mediapipe/pose": "^0.4.1633558788",
     "@tensorflow-models/pose-detection": "0.0.6",
     "@tensorflow/tfjs-backend-wasm": "^3.9.0",
@@ -20,7 +18,8 @@
     "@tensorflow/tfjs-core": "^3.9.0",
     "classnames": "^2.3.1",
     "comlink": "^4.3.1",
-    "twind": "^0.16.16"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.37",
@@ -28,9 +27,12 @@
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "autoprefixer": "^10.4.14",
     "eslint": "^8.38.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.2",
     "typescript": "^5.0.2",
     "vite": "^4.3.9"
   }

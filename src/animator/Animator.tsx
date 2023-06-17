@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { tw } from 'twind';
 import { Ping } from '../base/Ping';
 import { Dresser } from './Dresser';
 import type { Pose } from '../useEstimator';
@@ -23,7 +22,7 @@ export function Animator({ poses }: { poses: Pose[] | null }) {
   }, []);
 
   return (
-    <div className={tw`relative w-32 h-32 grid place-items-center border-2 border-gray-600 bg-gray-400`}>
+    <div className={`relative w-32 h-32 grid place-items-center border-2 border-gray-600 bg-gray-400`}>
       {pose && <Dresser pose={pose} />}
       {!poses && <Ping size="md" />}
     </div>
