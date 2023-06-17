@@ -21,7 +21,7 @@ function App() {
     // <Animator poses={poses} />
     <div className="bg-gray-900 flex flex-col items-center" style={{ height: '100vh' }}>
       {!recorderResult && (
-        <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={10} />
+        <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={20} />
       )}
       {recorderResult && <DownloadForm frames={recorderResult.frames} onSubmit={save} />}
     </div>
