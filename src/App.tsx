@@ -6,7 +6,7 @@ import { FrameEstimationDisplayList } from './FrameEstimationDisplayList';
 import { Button } from './base/buttons';
 import { Input } from './base/inputs';
 import { Animator } from './animator/Animator';
-
+import poses from './poses.json';
 function App() {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(null);
 
@@ -17,7 +17,8 @@ function App() {
     a.click();
   };
 
-  return (
+  return  (
+    // <Animator poses={poses} />
     <div className="bg-gray-900 flex flex-col items-center" style={{ height: '100vh' }}>
       {!recorderResult && (
         <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={10} />
@@ -31,6 +32,7 @@ function DownloadForm(props: { frames: ImageData[]; onSubmit: (values: { poses: 
   const [poses, setPoses] = useState<Pose[] | null>(null);
   const [name, setName] = useState('');
   const canSubmit = !!name && !!poses;
+
   return (
     <form
       className={`m-8 flex flex-col items-center`}
@@ -45,7 +47,7 @@ function DownloadForm(props: { frames: ImageData[]; onSubmit: (values: { poses: 
       <div className={`mt-8`}>
         <Input type="text" value={name} onChange={(ev) => setName(ev.currentTarget.value)} />
       </div>
-      <Button className={`mt-8`} type="submit" disabled={!canSubmit}>
+      <Button className={`mt-8 cursor-pointer`} type="submit" disabled={!canSubmit}>
         Save
       </Button>
     </form>
