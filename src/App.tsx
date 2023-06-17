@@ -7,9 +7,7 @@ import { Button } from './base/buttons';
 import { Input } from './base/inputs';
 import { Animator } from './animator/Animator';
 
-type AppProps = {};
-
-function App(props: AppProps) {
+function App() {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(null);
 
   const save = (values: { poses: Pose[]; name: string }) => {

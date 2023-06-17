@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Ping } from './base/Ping';
-import { getKeypointMap, stabilizeBody } from './bodyMath';
+import { getKeypointMap } from './bodyMath';
 import { Pose, useEstimator } from './useEstimator';
 
 export function FrameEstimationDisplayList({
@@ -15,9 +15,9 @@ export function FrameEstimationDisplayList({
     if (estimationStates.every((x): x is { pose: Pose; isEstimating: false } => !!x.pose)) {
       onComplete(estimationStates.map((x) => x.pose));
     }
-  }, [estimationStates]);
+  }, [onComplete, estimationStates]);
   return (
-    <div className={tw`flex flex-wrap gap-4`}>
+    <div className={`flex flex-wrap gap-4`}>
       {frames.map((x, i) => (
         <FrameEstimationDisplay key={i} {...estimationStates[i]} frame={frames[i]} />
       ))}

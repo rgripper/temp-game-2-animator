@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CameraDisplay } from './CameraDisplay';
 import useInterval from '../useInterval';
 import { Countdown } from './Countdown';
@@ -27,7 +27,7 @@ export function Recorder({ onComplete, countdownSeconds, durationSeconds, frames
         .forEach((track) => track.stop());
       onComplete({ frames, resolution: { width: video.videoWidth, height: video.videoHeight } });
     }
-  }, [video, isComplete, frames]);
+  }, [video, isComplete, frames, camera, onComplete]);
 
   return (
     <div className={`h-full w-full flex flex-col justify-center items-center`}>

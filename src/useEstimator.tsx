@@ -10,7 +10,7 @@ export type EstimationState = { pose: Pose | null; isEstimating: boolean };
 
 const defaultEstimationState = { pose: null, isEstimating: false };
 
-const worker = new Worker(new URL('./detector.js', import.meta.url), { type: 'module' });
+const worker = new Worker(new URL('./detector', import.meta.url), { type: 'module' });
 const detector = Comlink.wrap(worker);
 
 export function useEstimator(frames: ImageData[]) {

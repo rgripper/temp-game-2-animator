@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Ping } from '../base/Ping';
 
 export function Countdown({ seconds, onCompleted }: any) {
@@ -7,7 +7,7 @@ export function Countdown({ seconds, onCompleted }: any) {
     if (countdown === 0) {
       onCompleted();
     }
-  }, [countdown]);
+  }, [countdown, onCompleted]);
 
   return (
     <div className={`absolute top-0 left-0 w-full h-full flex justify-center items-center bg-transparent gap-8`}>
