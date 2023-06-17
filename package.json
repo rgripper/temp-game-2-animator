@@ -1,14 +1,17 @@
 {
+  "name": "temp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "snowpack dev",
-    "build": "snowpack build",
-    "test": "web-test-runner \"src/**/*.test.tsx\"",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\""
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/css": "^11.5.0",
-    "@emotion/react": "^11.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "@mediapipe/pose": "^0.4.1633558788",
     "@tensorflow-models/pose-detection": "0.0.6",
     "@tensorflow/tfjs-backend-wasm": "^3.9.0",
@@ -17,25 +20,18 @@
     "@tensorflow/tfjs-core": "^3.9.0",
     "classnames": "^2.3.1",
     "comlink": "^4.3.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "twind": "^0.16.16"
   },
   "devDependencies": {
-    "@snowpack/plugin-dotenv": "^2.0.5",
-    "@snowpack/plugin-react-refresh": "^2.4.0",
-    "@snowpack/plugin-typescript": "^1.2.0",
-    "@snowpack/web-test-runner-plugin": "^0.2.0",
-    "@testing-library/react": "^12.1.2",
-    "@types/chai": "^4.2.13",
-    "@types/mocha": "^9.0.0",
-    "@types/react": "^17.0.30",
-    "@types/react-dom": "^17.0.10",
-    "@types/snowpack-env": "^2.3.2",
-    "@web/test-runner": "^0.13.20",
-    "chai": "^4.2.0",
-    "prettier": "^2.3.2",
-    "snowpack": "^3.8.1",
-    "typescript": "^4.4.4"
+    "@types/react": "^18.0.37",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9"
   }
 }
