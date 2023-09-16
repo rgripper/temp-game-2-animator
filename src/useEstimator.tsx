@@ -11,7 +11,7 @@ export type EstimationState = { pose: Pose | null; isEstimating: boolean };
 const defaultEstimationState = { pose: null, isEstimating: false };
 
 const worker = new Worker(new URL('./detector', import.meta.url), { type: 'module' });
-const detector = Comlink.wrap(worker);
+const detector = Comlink.wrap<{ estimateFrame: (frame: ImageData) => poseDetection.Pose }>(worker);
 
 export function useEstimator(frames: ImageData[]) {
   const [estimationStates, setEstimationStates] = useState<EstimationState[]>(frames.map(() => defaultEstimationState));
@@ -28,10 +28,7 @@ export function useEstimator(frames: ImageData[]) {
             ),
           );
 
-          const currentPose = await (detector as any).estimateFrame(frame, {
-            flipHorizontal: false,
-            maxPoses: 1,
-          });
+          const currentPose = await detector.estimateFrame(frame);
 
           setEstimationStates((estimationStates) =>
             estimationStates.map((es, index) =>
