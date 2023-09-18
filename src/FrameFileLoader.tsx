@@ -1,7 +1,8 @@
 export function FrameFileLoader({ onLoaded }: { onLoaded: (images: ImageData[]) => void }) {
     return (
-        <div>
-            <input type="file" multiple onChange={async (e) => {
+        <label className="btn btn-outline relative">
+            Load images
+            <input className="w-0 h-0 absolute" type="file" multiple onChange={async (e) => {
                 const files = e.target.files;
                 if (!files) return;
                 let canvas: OffscreenCanvas | undefined = undefined;
@@ -18,7 +19,7 @@ export function FrameFileLoader({ onLoaded }: { onLoaded: (images: ImageData[]) 
 
                 onLoaded(contents)
             }} />
-        </div>
+        </label>
     )
 }
 
@@ -34,7 +35,10 @@ function fileToImage(file: File): Promise<HTMLImageElement> {
             resolve(img);
         };
 
-        img.onerror = reject;
+        img.onerror = (error) => {
+            URL.revokeObjectURL(img.src);
+            reject(error);
+        }
         img.src = url;   
     })
 }

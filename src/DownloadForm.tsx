@@ -24,9 +24,9 @@ export function DownloadForm(props: { frames: ImageData[]; }) {
       <div className={`mt-8`}>
         <Input type="text" value={name} onChange={(ev) => setName(ev.currentTarget.value)} />
       </div>
-      <Button className={`mt-8 cursor-pointer`} type="submit" disabled={!canSubmit}>
+      <button className={`btn btn-primary mt-8 cursor-pointer`} type="submit" disabled={!canSubmit}>
         Save
-      </Button>
+      </button>
     </form>
   );
 }

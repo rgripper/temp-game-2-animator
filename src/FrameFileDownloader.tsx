@@ -1,7 +1,7 @@
 import { RecorderResult } from "./recorder/Recorder";
 
 export function FrameFileDownloader({ recorderResult}: { recorderResult: RecorderResult}) {
-    return <button className='text-white' onClick={() => downloadAllFrames(recorderResult.frames)}>Download</button>
+    return <button className='btn btn-outline' onClick={() => downloadAllFrames(recorderResult.frames)}>Download</button>
 }
 
 const downloadFrame = async (canvas: OffscreenCanvas, imageData: ImageData, name: string) => {
