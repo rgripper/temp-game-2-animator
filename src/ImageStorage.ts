@@ -14,8 +14,8 @@ export class FrameStorage {
       images.map(async (image, i) => {
         const canvas = new OffscreenCanvas(image.width, image.height);
         canvas.getContext("2d")!.putImageData(image, 0, 0);
-        const blob = await canvas.convertToBlob({ type: "image/png" });
-        const fileName = `frame_${i}.png`;
+        const blob = await canvas.convertToBlob({ type: "image/webp" });
+        const fileName = `frame_${i}.webp`;
         const draftHandle = await rootDir.getFileHandle(fileName, {
           create: true,
         });
