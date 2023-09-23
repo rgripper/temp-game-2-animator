@@ -25,7 +25,7 @@ jobs:
 
       - name: Install dependencies
         shell: bash
-        run: pnpm install... #... means include local dependencies
+        run: pnpm install
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
