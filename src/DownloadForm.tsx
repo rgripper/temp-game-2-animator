@@ -1,14 +1,13 @@
 import { useState } from "react";
 import type { Pose } from "./useEstimator";
 import { FrameEstimationDisplayList } from "./FrameEstimationDisplayList";
-import { Input } from "./base/inputs";
 import { Animator } from "./animator/Animator";
 
 export function DownloadForm(props: { frames: ImageData[] }) {
   const [poses, setPoses] = useState<Pose[] | null>(null);
   const [name, setName] = useState("");
   const canSubmit = !!name && !!poses;
-  console.log("poses", poses);
+
   return (
     <form
       className={`m-8 flex flex-col items-center`}
