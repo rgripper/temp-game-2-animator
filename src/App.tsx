@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { Recorder, RecorderResult } from "./recorder/Recorder";
 import type { Pose } from "./useEstimator";
@@ -7,6 +7,8 @@ import { FrameFileDownloader } from "./FrameFileDownloader";
 import { DownloadForm } from "./DownloadForm";
 import { FrameFileLoader } from "./FrameFileLoader";
 import { FrameStorage } from "./ImageStorage";
+import { detectorClient } from "./detectorClient";
+
 function App() {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(
     null,

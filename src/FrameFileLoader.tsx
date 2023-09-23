@@ -13,19 +13,13 @@ export function FrameFileLoader({
         onChange={async (e) => {
           const files = e.target.files;
           if (!files) return;
-          let canvas: OffscreenCanvas | undefined = undefined;
 
           const contents = await Promise.all(
             Array.from(files)
               .sort((a, b) => a.name.localeCompare(b.name))
               .map(async (file) => {
                 const img = await fileToImage(file);
-
-                canvas ??= new OffscreenCanvas(img.width, img.height);
-
-                const context = canvas.getContext("2d")!;
-                context.drawImage(img, 0, 0);
-                return context.getImageData(0, 0, img.width, img.height);
+                return imageToImageData(img);
               }),
           );
 
@@ -36,21 +30,21 @@ export function FrameFileLoader({
   );
 }
 
-function fileToImage(file: File): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file); // create an Object URL
-    const img = new Image(); // create a temp. image object
+function imageToImageData(img: HTMLImageElement) {
+  const canvas = new OffscreenCanvas(img.width, img.height);
+  const context = canvas.getContext("2d")!;
+  context.drawImage(img, 0, 0);
+  return context.getImageData(0, 0, img.width, img.height);
+}
 
-    img.onload = function () {
-      // handle async image loading
-      URL.revokeObjectURL(img.src);
-      resolve(img);
-    };
-
-    img.onerror = (error) => {
-      URL.revokeObjectURL(img.src);
-      reject(error);
-    };
+async function fileToImage(file: File): Promise<HTMLImageElement> {
+  const url = URL.createObjectURL(file); // create an Object URL
+  const img = new Image(); // create a temp. image object
+  try {
     img.src = url;
-  });
+    await img.decode();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+  return img;
 }

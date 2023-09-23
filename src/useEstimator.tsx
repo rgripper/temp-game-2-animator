@@ -1,7 +1,6 @@
-import React from "react";
 import type * as poseDetection from "@tensorflow-models/pose-detection";
 import { useEffect, useState } from "react";
-import * as Comlink from "comlink";
+import { detectorClient } from "./detectorClient";
 
 export type Pose = poseDetection.Pose;
 export type Keypoint = poseDetection.Keypoint;
@@ -9,13 +8,6 @@ export type Point = { x: number; y: number; z?: number };
 export type EstimationState = { pose: Pose | null; isEstimating: boolean };
 
 const defaultEstimationState = { pose: null, isEstimating: false };
-
-const worker = new Worker(new URL("./detector", import.meta.url), {
-  type: "module",
-});
-const detector = Comlink.wrap<{
-  estimateFrame: (frame: ImageData) => poseDetection.Pose;
-}>(worker);
 
 export function useEstimator(frames: ImageData[]) {
   const [estimationStates, setEstimationStates] = useState<EstimationState[]>(
@@ -36,7 +28,7 @@ export function useEstimator(frames: ImageData[]) {
             ),
           );
           console.log("Sending frame", frameIndex, frame);
-          const currentPose = await detector.estimateFrame(frame);
+          const currentPose = await detectorClient.estimateFrame(frame);
           console.log("Received a pose", currentPose);
 
           setEstimationStates((estimationStates) =>

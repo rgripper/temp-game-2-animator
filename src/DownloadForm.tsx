@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { Pose } from "./useEstimator";
 import { FrameEstimationDisplayList } from "./FrameEstimationDisplayList";
-import { Button } from "./base/buttons";
 import { Input } from "./base/inputs";
 import { Animator } from "./animator/Animator";
 
@@ -25,7 +24,8 @@ export function DownloadForm(props: { frames: ImageData[] }) {
         <Animator poses={poses} />
       </div>
       <div className={`mt-8`}>
-        <Input
+        <input
+          className="input input-primary"
           type="text"
           value={name}
           onChange={(ev) => setName(ev.currentTarget.value)}

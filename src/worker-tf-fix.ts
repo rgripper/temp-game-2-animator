@@ -1,2 +1,2 @@
 // @ts-ignore
-self.window = self;
+// self.window = self;
