@@ -38,10 +38,10 @@ function imageToImageData(img: HTMLImageElement) {
 }
 
 async function fileToImage(file: File): Promise<HTMLImageElement> {
-  const url = URL.createObjectURL(file); // create an Object URL
-  const img = new Image(); // create a temp. image object
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.src = url;
   try {
-    img.src = url;
     await img.decode();
   } finally {
     URL.revokeObjectURL(url);

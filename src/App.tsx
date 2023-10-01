@@ -20,10 +20,17 @@ function App() {
       className="flex flex-col items-center justify-center"
       style={{ height: "100vh" }}
     >
-      {/* {!recorderResult && (
-        <Recorder onComplete={setRecorderResult} countdownSeconds={3} durationSeconds={2} framesPerSec={20} />
+      {!recorderResult && (
+        <Recorder
+          onComplete={setRecorderResult}
+          countdownSeconds={3}
+          durationSeconds={2}
+          framesPerSec={20}
+        />
       )}
-      {recorderResult && <FrameFileDownloader recorderResult={recorderResult} />} */}
+      {recorderResult && (
+        <FrameFileDownloader recorderResult={recorderResult} />
+      )}
       <FileStorage
         recorderResult={recorderResult}
         setRecorderResult={setRecorderResult}
