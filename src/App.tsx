@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import { Recorder, RecorderResult } from "./recorder/Recorder";
-import type { Pose } from "./useEstimator";
-import poses from "./poses.json";
 import { FrameFileDownloader } from "./FrameFileDownloader";
 import { DownloadForm } from "./DownloadForm";
 import { FrameFileLoader } from "./FrameFileLoader";
-import { FrameStorage } from "./ImageStorage";
-import { detectorClient } from "./detectorClient";
+import { FrameBatchStorage } from "./FrameBatchStorage";
 
 function App() {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(
@@ -28,13 +25,12 @@ function App() {
           framesPerSec={20}
         />
       )}
-      {recorderResult && (
-        <FrameFileDownloader recorderResult={recorderResult} />
-      )}
-      <FileStorage
-        recorderResult={recorderResult}
-        setRecorderResult={setRecorderResult}
-      />
+      <div>
+        <FileStorage
+          recorderResult={recorderResult}
+          setRecorderResult={setRecorderResult}
+        />
+      </div>
       <FrameFileLoader
         onLoaded={(frames) =>
           setRecorderResult({ frames, resolution: frames[0] })
@@ -58,7 +54,7 @@ function FileStorage({
         className="btn btn-outline"
         onClick={() => {
           if (!recorderResult) return;
-          new FrameStorage().save(recorderResult.frames);
+          new FrameBatchStorage().save(recorderResult.frames);
         }}
       >
         Save
@@ -66,13 +62,23 @@ function FileStorage({
       <button
         className="btn btn-outline"
         onClick={async () => {
-          const data = await new FrameStorage().load();
+          const data = await new FrameBatchStorage().load();
           if (!data) return;
           setRecorderResult({ frames: data, resolution: data[0] });
         }}
       >
         Load
       </button>
+      <button
+        className="btn btn-outline"
+        onClick={async () => {
+          await new FrameBatchStorage().clear();
+          setRecorderResult(null);
+        }}
+      >
+        Clear
+      </button>
+      <FrameFileDownloader />
     </>
   );
 }

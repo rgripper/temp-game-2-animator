@@ -1,13 +1,33 @@
-export class FrameStorage {
-  // downloadImages(images: ImageData[]) {
+export class FrameBatchStorage {
+  async download() {
+    const fileNames = this.getNames();
+    if (!fileNames) return;
+    const rootDir = await navigator.storage.getDirectory();
 
-  // }
+    await Promise.all(
+      fileNames.map((x) =>
+        rootDir
+          .getFileHandle(x)
+          .then((x) => x.getFile())
+          .then(downloadFile),
+      ),
+    );
+  }
+
+  async clear() {
+    const fileNames = this.getNames();
+    if (!fileNames) return;
+    const rootDir = await navigator.storage.getDirectory();
+
+    await Promise.all(fileNames.map((x) => rootDir.removeEntry(x)));
+  }
 
   // convertFilesToImageData(files: File[]): Promise<ImageData[]> {
   //     return Promise.resolve([]);
   // }
 
   async save(images: ImageData[]): Promise<void> {
+    await this.clear();
     const rootDir = await navigator.storage.getDirectory();
 
     const fileNames = await Promise.all(
@@ -60,21 +80,24 @@ export class FrameStorage {
   }
 }
 
-function fileToImage(file: File): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file); // create an Object URL
-    const img = new Image(); // create a temp. image object
+async function fileToImage(file: File) {
+  const url = URL.createObjectURL(file); // create an Object URL
+  const img = new Image(); // create a temp. image object
+  img.src = url;
+  try {
+    await img.decode();
+  } finally {
+    URL.revokeObjectURL(img.src);
+  }
 
-    img.onload = function () {
-      // handle async image loading
-      URL.revokeObjectURL(img.src);
-      resolve(img);
-    };
+  return img;
+}
 
-    img.onerror = (error) => {
-      URL.revokeObjectURL(img.src);
-      reject(error);
-    };
-    img.src = url;
-  });
+function downloadFile(file: File) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = file.name;
+  a.click();
+  URL.revokeObjectURL(url);
 }
