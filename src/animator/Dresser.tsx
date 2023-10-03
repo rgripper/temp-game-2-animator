@@ -27,7 +27,7 @@ export function Dresser({ pose }: { pose: Pose }) {
   return (
     <canvas
       className={`w-full h-full`}
-      style={{ imageRendering: "crisp-edges" }}
+      style={{ imageRendering: "pixelated" }}
       ref={setCanvas}
     />
   );
@@ -43,6 +43,8 @@ function scaleDown(pose: Pose): Pose {
     })),
   };
 }
+
+const limbWidth = 4;
 
 function renderPose(
   canvas: HTMLCanvasElement,
@@ -114,17 +116,18 @@ function renderPose(
     augKeypointMap.left_knee,
     ctx,
     metalImage,
-    3,
+    limbWidth * 2.5,
   );
   drawLimb(
     augKeypointMap.right_hip,
     augKeypointMap.right_knee,
     ctx,
     metalImage,
-    3,
+    limbWidth * 2.5,
   );
 
   ctx.strokeStyle = "orange";
+  ctx.lineWidth = limbWidth * 1.5;
   ctx.moveTo(augKeypointMap.left_knee.x, augKeypointMap.left_knee.y);
   ctx.lineTo(augKeypointMap.left_ankle.x, augKeypointMap.left_ankle.y);
 
@@ -231,40 +234,45 @@ function drawTorso(
     keypointMap.right_wrist,
     ctx,
     metalImage,
-    2,
+    limbWidth,
   );
-  drawLimb(keypointMap.left_elbow, keypointMap.left_wrist, ctx, metalImage, 2);
+  drawLimb(
+    keypointMap.left_elbow,
+    keypointMap.left_wrist,
+    ctx,
+    metalImage,
+    limbWidth,
+  );
   drawLimb(
     keypointMap.right_shoulder,
     keypointMap.right_elbow,
     ctx,
     metalImage,
-    3,
+    limbWidth * 1.5,
   );
   drawLimb(
     keypointMap.left_shoulder,
     keypointMap.left_elbow,
     ctx,
     metalImage,
-    3,
+    limbWidth * 1.5,
   );
 
-  drawLimb(keypointMap.left_hip, keypointMap.right_hip, ctx, metalImage, 3);
+  drawLimb(keypointMap.left_hip, keypointMap.right_hip, ctx, metalImage, 6);
 
   // torso
   ctx.save();
   ctx.beginPath();
 
-  const armWidth = 2;
   ctx.moveTo(
     keypointMap.left_shoulder.x,
-    keypointMap.left_shoulder.y - armWidth + 1,
+    keypointMap.left_shoulder.y - limbWidth + 1,
   );
   ctx.lineTo(
-    keypointMap.right_shoulder.x - armWidth,
-    keypointMap.right_shoulder.y - armWidth + 1,
+    keypointMap.right_shoulder.x - limbWidth,
+    keypointMap.right_shoulder.y - limbWidth + 1,
   );
-  ctx.lineTo(keypointMap.right_hip.x - armWidth, keypointMap.right_hip.y);
+  ctx.lineTo(keypointMap.right_hip.x - limbWidth, keypointMap.right_hip.y);
   ctx.lineTo(keypointMap.left_hip.x, keypointMap.left_hip.y);
   // ctx.moveTo(keypointMap.left_shoulder.x, keypointMap.left_shoulder.y);
   // ctx.closePath();

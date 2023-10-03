@@ -20,11 +20,8 @@ export class FrameBatchStorage {
     const rootDir = await navigator.storage.getDirectory();
 
     await Promise.all(fileNames.map((x) => rootDir.removeEntry(x)));
+    this.clearNames();
   }
-
-  // convertFilesToImageData(files: File[]): Promise<ImageData[]> {
-  //     return Promise.resolve([]);
-  // }
 
   async save(images: ImageData[]): Promise<void> {
     await this.clear();
@@ -77,6 +74,10 @@ export class FrameBatchStorage {
     const item = window.localStorage.getItem("saveImages");
     if (!item) return null;
     return JSON.parse(item) as string[];
+  }
+
+  clearNames() {
+    window.localStorage.removeItem("saveImages");
   }
 }
 

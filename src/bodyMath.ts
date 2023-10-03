@@ -194,7 +194,7 @@ export type AugmentedKeypointMap = KeypointMap & {
 export function getCenterBetweenFeet(keypointMap: KeypointMap): Point {
   return {
     x: (keypointMap.left_ankle.x + keypointMap.right_ankle.x) / 2,
-    y: (keypointMap.left_ankle.y + keypointMap.right_ankle.y) / 2,
+    y: (keypointMap.left_ankle.y + keypointMap.right_ankle.y) * 0.3,
   };
 }
 

@@ -17,14 +17,14 @@ function App() {
       className="flex flex-col items-center justify-center"
       style={{ height: "100vh" }}
     >
-      {!recorderResult && (
+      {/* {!recorderResult && (
         <Recorder
           onComplete={setRecorderResult}
           countdownSeconds={3}
           durationSeconds={2}
           framesPerSec={20}
         />
-      )}
+      )} */}
       <div>
         <FileStorage
           recorderResult={recorderResult}
