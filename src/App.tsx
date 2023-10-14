@@ -5,39 +5,41 @@ import { FrameFileDownloader } from "./FrameFileDownloader";
 import { DownloadForm } from "./DownloadForm";
 import { FrameFileLoader } from "./FrameFileLoader";
 import { FrameBatchStorage } from "./FrameBatchStorage";
+import { Animator } from "./animator/Animator";
 
+import { poses } from "./poses.json";
 function App() {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(
     null,
   );
 
   return (
-    // <Animator poses={poses} />
-    <div
-      className="flex flex-col items-center justify-center"
-      style={{ height: "100vh" }}
-    >
-      {/* {!recorderResult && (
-        <Recorder
-          onComplete={setRecorderResult}
-          countdownSeconds={3}
-          durationSeconds={2}
-          framesPerSec={20}
-        />
-      )} */}
-      <div>
-        <FileStorage
-          recorderResult={recorderResult}
-          setRecorderResult={setRecorderResult}
-        />
-      </div>
-      <FrameFileLoader
-        onLoaded={(frames) =>
-          setRecorderResult({ frames, resolution: frames[0] })
-        }
-      />
-      {recorderResult && <DownloadForm frames={recorderResult.frames} />}
-    </div>
+    <Animator poses={poses} />
+    // <div
+    //   className="flex flex-col items-center justify-center"
+    //   style={{ height: "100vh" }}
+    // >
+    //   {/* {!recorderResult && (
+    //     <Recorder
+    //       onComplete={setRecorderResult}
+    //       countdownSeconds={3}
+    //       durationSeconds={2}
+    //       framesPerSec={20}
+    //     />
+    //   )} */}
+    //   <div>
+    //     <FileStorage
+    //       recorderResult={recorderResult}
+    //       setRecorderResult={setRecorderResult}
+    //     />
+    //   </div>
+    //   <FrameFileLoader
+    //     onLoaded={(frames) =>
+    //       setRecorderResult({ frames, resolution: frames[0] })
+    //     }
+    //   />
+    //   {recorderResult && <DownloadForm frames={recorderResult.frames} />}
+    // </div>
   );
 }
 
