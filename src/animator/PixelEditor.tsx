@@ -1,69 +1,76 @@
-import type { Pose } from "../useEstimator";
-import React, { useEffect, useState } from "react";
-import metalSrc from "../assets/metal.jpg";
-import swordSrc from "../assets/sword3.png";
-import helmetSrc from "../assets/helmet.png";
+import React, { useMemo } from "react";
 import { drawPose } from "../drawPose";
-import { adjustPoseToCanvas } from "../bodyMath";
 import { AugmentedKeypointMap } from "../KeypointMap";
+import { Pose } from "../useEstimator";
+import { adjustPoseToCanvas } from "../bodyMath";
 
-export function Dresser({ pose }: { pose: Pose }) {
-  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
-
-  const metalImage = useImage(metalSrc);
-  const swordImage = useImage(swordSrc);
-  const helmetImage = useImage(helmetSrc);
-
-  useEffect(() => {
-    if (canvas && metalImage && swordImage && helmetImage) {
-      const ctx = canvas.getContext("2d")!;
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.imageSmoothingEnabled = false;
-
-      const adjustedKeypointMap = adjustPoseToCanvas(pose, 32, 32);
-
-      const data = drawPoseOnCanvas(adjustedKeypointMap);
-      console.log(data);
-      ctx.putImageData(data, 0, 0, 0, 0, 32, 32);
-      ctx.save();
-      // renderPose(
-      //   canvas,
-      //   adjustedKeypointMap,
-      //   metalImage,
-      //   swordImage,
-      //   helmetImage,
-      // );
-    }
-  }, [canvas, pose, metalImage, swordImage, helmetImage]);
-
+const dimensions = { width: 100, height: 100 };
+export function PixelEditor({ pose }: { pose: Pose }) {
+  const imageData = useMemo(
+    () =>
+      drawPoseOnCanvas(
+        adjustPoseToCanvas(pose, dimensions.width, dimensions.height),
+        dimensions,
+      ),
+    [pose],
+  );
+  const colorGrid = useMemo<string[][]>(
+    () => createColorGrid(imageData),
+    [imageData],
+  );
   return (
-    <canvas
-      className={`w-[32px] h-[32px]`}
-      style={{ imageRendering: "pixelated" }}
-      ref={setCanvas}
-    />
+    <div>
+      {colorGrid.map((row, i) => (
+        <div key={i} className={`flex`}>
+          {row.map((color, j) => (
+            <div
+              key={j}
+              className={`w-2 h-2 flex-shrink-0 border`}
+              style={{ backgroundColor: color }}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
-function drawPoseOnCanvas(adjustedKeypointMap: AugmentedKeypointMap) {
-  const offscreenCanvas = new OffscreenCanvas(32, 32);
+function drawPoseOnCanvas(
+  adjustedKeypointMap: AugmentedKeypointMap,
+  dimensions: { width: number; height: number },
+) {
+  const offscreenCanvas = new OffscreenCanvas(
+    dimensions.width,
+    dimensions.height,
+  );
   const offCtx = offscreenCanvas.getContext("2d")!;
-  offCtx.fillStyle = "red";
+  offCtx.fillStyle = "white";
   offCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
   offCtx.imageSmoothingEnabled = true;
   offCtx.imageSmoothingQuality = "high";
 
   drawPose(offCtx, adjustedKeypointMap, 4, "brown");
-  return offCtx.getImageData(0, 0, 32, 32);
+  return offCtx.getImageData(
+    0,
+    0,
+    offscreenCanvas.width,
+    offscreenCanvas.height,
+  );
 }
 
-function useImage(src: string) {
-  const [image, setImage] = useState<null | HTMLImageElement>(null);
-  useEffect(() => {
-    const imageElement = new Image();
-    imageElement.src = src;
-    imageElement.decode().then(() => setImage(imageElement));
-  }, [src]);
-  return image;
+function createColorGrid(imageData: ImageData): string[][] {
+  const colorGrid: string[][] = [];
+  for (let i = 0; i < imageData.height; i++) {
+    const row: string[] = [];
+    for (let j = 0; j < imageData.width; j++) {
+      const index = i * imageData.width * 4 + j * 4;
+      const r = imageData.data[index];
+      const g = imageData.data[index + 1];
+      const b = imageData.data[index + 2];
+      const a = imageData.data[index + 3];
+      row.push(`rgba(${r},${g},${b},${a})`);
+    }
+    colorGrid.push(row);
+  }
+  return colorGrid;
 }

@@ -3,9 +3,7 @@ import React, { useEffect, useState } from "react";
 import metalSrc from "../assets/metal.jpg";
 import swordSrc from "../assets/sword3.png";
 import helmetSrc from "../assets/helmet.png";
-import { drawPose } from "../drawPose";
 import { adjustPoseToCanvas } from "../bodyMath";
-import { AugmentedKeypointMap } from "../KeypointMap";
 import { renderPose } from "./renderPose";
 
 export function Dresser({ pose }: { pose: Pose }) {

@@ -8,13 +8,15 @@ import { FrameBatchStorage } from "./FrameBatchStorage";
 import { Animator } from "./animator/Animator";
 
 import { poses } from "./poses.json";
+import { PixelEditor } from "./animator/PixelEditor";
 function App() {
   const [recorderResult, setRecorderResult] = useState<RecorderResult | null>(
     null,
   );
 
   return (
-    <Animator poses={poses} />
+    <PixelEditor pose={poses[0]} />
+    // <Animator poses={poses} />
     // <div
     //   className="flex flex-col items-center justify-center"
     //   style={{ height: "100vh" }}

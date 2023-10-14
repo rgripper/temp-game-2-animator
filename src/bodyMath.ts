@@ -43,12 +43,13 @@ export function adjustPoseToCanvas(pose: Pose, width: number, height: number) {
 }
 
 function scaleDown(pose: Pose, width: number, height: number): Pose {
+  const scalingFactor = 450;
   return {
     ...pose,
     keypoints: pose.keypoints.map((kp) => ({
       ...kp,
-      x: kp.x * 0.3,
-      y: kp.y * 0.3,
+      x: (kp.x * width) / scalingFactor,
+      y: (kp.y * height) / scalingFactor,
     })),
   };
 }
@@ -80,6 +81,7 @@ export function centerBody(
 ): KeypointMap {
   const bodyCenter = getBodyCenter(keypointMap);
   const imageCenter = { x: imageWidth / 2, y: imageHeight / 2 };
+  console.log("imageCenter", imageCenter);
   const offset = {
     x: imageCenter.x - bodyCenter.x,
     y: imageCenter.y - bodyCenter.y,
