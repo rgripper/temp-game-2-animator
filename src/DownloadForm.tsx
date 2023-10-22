@@ -19,9 +19,7 @@ export function DownloadForm(props: { frames: ImageData[] }) {
           onComplete={setPoses}
         />
       </div>
-      <div className={`mt-8`}>
-        <Animator poses={poses} />
-      </div>
+      <div className={`mt-8`}>{poses && <Animator poses={poses} />}</div>
       <div className={`mt-8`}>
         <input
           className="input input-primary"
