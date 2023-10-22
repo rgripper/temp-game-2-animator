@@ -15,8 +15,7 @@ function App() {
   );
 
   return (
-    <PixelEditor pose={poses[0]} />
-    // <Animator poses={poses} />
+    <Animator poses={poses} />
     // <div
     //   className="flex flex-col items-center justify-center"
     //   style={{ height: "100vh" }}
